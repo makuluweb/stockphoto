@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rate My Photo — Adobe Stock Analyzer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #08080f;
+    --surface: #0e0e1c;
+    --surface2: #131325;
+    --border: #1e1e38;
+    --border2: #282848;
+    --text: #e4e4f0;
+    --muted: #6a6a90;
+    --faint: #3a3a58;
+    --accent: #5b8fff;
+    --accent2: #3d6fff;
+    --green: #3dd68c;
+    --yellow: #f5c842;
+    --red: #f05a5a;
+    --orange: #f0894a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle animated background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(91,143,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(91,143,255,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 18px 80px;
+  }
+
+  /* ── HEADER ── */
+  header {
+    padding: 40px 0 0;
+    text-align: center;
+    animation: fadeDown 0.6s ease both;
+  }
+
+  .logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    color: #fff;
+  }
+
+  h1 span {
+    background: linear-gradient(135deg, var(--accent), #a78bfa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    margin-top: 10px;
+    font-size: 15px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* ── TABS ── */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 5px;
+    margin: 28px 0 0;
+    animation: fadeDown 0.6s 0.1s ease both;
+  }
+
+  .tab {
+    flex: 1;
+    padding: 11px 10px;
+    border-radius: 10px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.22s;
+  }
+
+  .tab.active {
+    background: var(--surface2);
+    color: #fff;
+    font-weight: 600;
+    border: 1px solid var(--border2);
+  }
+
+  /* ── PANELS ── */
+  .panel { display: none; animation: fadeUp 0.4s ease both; }
+  .panel.active { display: block; }
+
+  /* ── STAT BAR ── */
+  .stat-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 22px 0;
+    animation: fadeUp 0.4s 0.05s ease both;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .stat-lbl {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SETUP STEPS ── */
+  .steps { display: flex; flex-direction: column; gap: 10px; }
+
+  .step-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: border-color 0.2s;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  .step-card:hover { border-color: var(--border2); }
+
+  .step-num {
+    min-width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .step-body { flex: 1; }
+
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 5px;
+  }
+
+  .step-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .badge-req  { background: #0d1f3a; border: 1px solid #2a4a8a; color: #5b8fff; }
+  .badge-crit { background: #2a0d0d; border: 1px solid #8a2a2a; color: #f05a5a; }
+  .badge-ong  { background: #0d2a1a; border: 1px solid #2a6a4a; color: #3dd68c; }
+
+  .step-detail { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  .step-link {
+    display: inline-block;
+    margin-top: 7px;
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .step-link:hover { text-decoration: underline; }
+
+  /* ── INFO BLOCKS ── */
+  .info-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 12px;
+  }
+
+  .info-block h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .tags-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
+
+  .tag-pill {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 30px;
+    padding: 5px 13px;
+    font-size: 12px;
+    color: #b0b0d8;
+  }
+
+  .tip-row {
+    display: flex;
+    gap: 9px;
+    margin-bottom: 8px;
+    align-items: flex-start;
+  }
+
+  .tip-row span:first-child { color: var(--accent); font-size: 13px; margin-top: 1px; }
+  .tip-row span:last-child { font-size: 13px; color: var(--muted); line-height: 1.45; }
+
+  /* ── DROPZONE ── */
+  #dropzone {
+    background: var(--surface);
+    border: 2px dashed var(--border2);
+    border-radius: 18px;
+    padding: 48px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 22px 0 14px;
+    position: relative;
+  }
+
+  #dropzone.dragover {
+    border-color: var(--accent);
+    background: #0e1630;
+  }
+
+  #dropzone .dz-icon { font-size: 44px; margin-bottom: 14px; display: block; }
+  #dropzone .dz-text { font-size: 15px; color: var(--muted); }
+  #dropzone .dz-sub { font-size: 12px; color: var(--faint); margin-top: 5px; }
+
+  #dropzone img#preview {
+    max-height: 260px;
+    max-width: 100%;
+    border-radius: 12px;
+    object-fit: contain;
+  }
+
+  #fileInput { display: none; }
+
+  /* ── BUTTONS ── */
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: opacity 0.2s, transform 0.15s;
+    margin-bottom: 14px;
+  }
+
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  .btn-ghost {
+    width: 100%;
+    padding: 12px;
+    border-radius: 10px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── LOADING ── */
+  #loading {
+    text-align: center;
+    padding: 40px 0;
+    display: none;
+  }
+
+  .spinner {
+    width: 44px;
+    height: 44px;
+    border: 3px solid var(--border2);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 16px;
+  }
+
+  #loading p { color: var(--muted); font-size: 14px; }
+
+  /* ── ERROR ── */
+  #error-box {
+    background: #1f0d0d;
+    border: 1px solid #6a2a2a;
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--red);
+    font-size: 13px;
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  /* ── RESULTS ── */
+  #results { display: none; }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 30px 24px;
+    text-align: center;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .score-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; left: 50%; transform: translateX(-50%);
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(91,143,255,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .score-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1;
+    position: relative;
+  }
+
+  .score-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  .verdict-pill {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 18px;
+    border-radius: 30px;
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .score-summary {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ── GRID 2-COL ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .rc-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .rc-item {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  /* ── KEYWORDS ── */
+  .kw-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+
+  .kw-card .rc-label { color: var(--accent); }
+
+  .kw-wrap { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 6px; }
+
+  .kw-pill {
+    padding: 5px 13px;
+    border-radius: 30px;
+    font-size: 12px;
+  }
+
+  .kw-top {
+    background: #0d1a38;
+    border: 1px solid #2a4a88;
+    color: #7aaeff;
+  }
+
+  .kw-norm {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: #9090b8;
+  }
+
+  .kw-note { font-size: 11px; color: var(--faint); margin-top: 9px; }
+
+  /* ── TIP BLOCK ── */
+  .tip-block {
+    background: linear-gradient(135deg, #0a1530, #0c1840);
+    border: 1px solid #1e3870;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 12px;
+  }
+
+  .tip-block .rc-label { color: var(--accent); }
+  .tip-block p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-top: 6px; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── MOBILE ── */
+  @media (max-width: 480px) {
+    .stat-bar { grid-template-columns: repeat(2, 1fr); }
+    .grid2 { grid-template-columns: 1fr; }
+    h1 { font-size: 26px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-badge">📸 Adobe Stock</div>
+    <h1>Rate My <span>Photo</span></h1>
+    <p class="subtitle">AI-powered stock market analysis &amp; contributor setup guide</p>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('analyze')">🔍 Analyze Photo</button>
+    <button class="tab" onclick="switchTab('setup')">🚀 Setup Guide</button>
+  </div>
+
+  <!-- ══ ANALYZE PANEL ══ -->
+  <div class="panel active" id="panel-analyze">
+
+    <!-- Drop zone -->
+    <div id="dropzone" onclick="document.getElementById('fileInput').click()"
+         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)"
+         ondrop="handleDrop(event)">
+      <span class="dz-icon" id="dz-icon">🖼️</span>
+      <div class="dz-text" id="dz-text">Tap or drag a photo here to begin</div>
+      <div class="dz-sub" id="dz-sub">JPEG · PNG · WEBP — up to 20MB</div>
+      <img id="preview" style="display:none" alt="preview" />
+    </div>
+    <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+
+    <button class="btn-primary" id="analyzeBtn" onclick="analyzePhoto()" disabled>
+      ✨ Analyze for Adobe Stock
+    </button>
+
+    <!-- Loading -->
+    <div id="loading">
+      <div class="spinner"></div>
+      <p>Analyzing commercial potential…</p>
+    </div>
+
+    <!-- Error -->
+    <div id="error-box"></div>
+
+    <!-- Results -->
+    <div id="results">
+
+      <!-- Score card -->
+      <div class="score-card">
+        <div class="score-num" id="res-score">—</div>
+        <div class="score-label">Stock Potential Score / 100</div>
+        <div class="verdict-pill" id="res-verdict"></div>
+        <p class="score-summary" id="res-summary"></p>
+      </div>
+
+      <!-- Strengths & Issues -->
+      <div class="grid2">
+        <div class="result-card">
+          <div class="rc-label" style="color: var(--green)">✓ Strengths</div>
+          <div id="res-strengths"></div>
+        </div>
+        <div class="result-card">
+          <div class="rc-label" style="color: var(--red)">⚠ Issues</div>
+          <div id="res-issues"></div>
+        </div>
+      </div>
+
+      <!-- Keywords -->
+      <div class="kw-card">
+        <div class="rc-label">🔑 Suggested Keywords</div>
+        <div class="kw-wrap" id="res-keywords"></div>
+        <div class="kw-note">★ Top-ranked — prioritise these in your first 10 keyword slots</div>
+      </div>
+
+      <!-- Release & Categories -->
+      <div class="grid2">
+        <div class="result-card">
+          <div class="rc-label" style="color: var(--muted)">Release Needed</div>
+          <div id="res-release" style="font-family:'Syne',sans-serif; font-size:15px; font-weight:700; margin-top:4px;"></div>
+        </div>
+        <div class="result-card">
+          <div class="rc-label" style="color: var(--muted)">Best Categories</div>
+          <div id="res-categories"></div>
+        </div>
+      </div>
+
+      <!-- Tip -->
+      <div class="tip-block">
+        <div class="rc-label">💡 Top Improvement Tip</div>
+        <p id="res-tip"></p>
+      </div>
+
+      <button class="btn-ghost" onclick="resetAnalyzer()">← Analyze Another Photo</button>
+    </div>
+  </div>
+
+  <!-- ══ SETUP PANEL ══ -->
+  <div class="panel" id="panel-setup">
+
+    <!-- Stats -->
+    <div class="stat-bar">
+      <div class="stat-card"><div class="stat-val">33%</div><div class="stat-lbl">Photo Royalty</div></div>
+      <div class="stat-card"><div class="stat-val">35%</div><div class="stat-lbl">Video Royalty</div></div>
+      <div class="stat-card"><div class="stat-val">5–15d</div><div class="stat-lbl">Review Time</div></div>
+      <div class="stat-card"><div class="stat-val">$25</div><div class="stat-lbl">Min Payout</div></div>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step-card" style="animation-delay:0.0s">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <div class="step-head">
+            <span class="step-title">Create Adobe ID</span>
+            <span class="badge badge-req">Required</span>
+          </div>
+          <p class="step-detail">Go to adobe.com and sign up — it's free and takes 2 minutes. Choose your country carefully; it cannot be changed later.</p>
+          <a class="step-link" href="https://adobe.com" target="_blank">→ adobe.com</a>
+        </div>
+      </div>
+
+      <div class="step-card" style="animation-delay:0.05s">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <div class="step-head">
+            <span class="step-title">Join Contributor Portal</span>
+            <span class="badge badge-req">Required</span>
+          </div>
+          <p class="step-detail">Visit contributor.stock.adobe.com and accept the Contributor Agreement to unlock your upload dashboard.</p>
+          <a class="step-link" href="https://contributor.stock.adobe.com" target="_blank">→ contributor.stock.adobe.com</a>
+        </div>
+      </div>
+
+      <div class="step-card" style="animation-delay:0.1s">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <div class="step-head">
+            <span class="step-title">Submit Tax Form</span>
+            <span class="badge badge-crit">Critical</span>
+          </div>
+          <p class="step-detail">Add your tax info under Account Settings immediately. Without it, Adobe withholds up to 30% of all earnings — do this before your first upload.</p>
+        </div>
+      </div>
+
+      <div class="step-card" style="animation-delay:0.15s">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <div class="step-head">
+            <span class="step-title">Set Up Payout</span>
+            <span class="badge badge-req">Required</span>
+          </div>
+          <p class="step-detail">Link PayPal or a bank account in your contributor settings. Payouts release once you reach a $25 minimum balance.</p>
+        </div>
+      </div>
+
+      <div class="step-card" style="animation-delay:0.2s">
+        <div class="step-num">05</div>
+        <div class="step-body">
+          <div class="step-head">
+            <span class="step-title">Upload &amp; Keyword</span>
+            <span class="badge badge-ong">Ongoing</span>
+          </div>
+          <p class="step-detail">Upload JPEGs (4MP–100MP, under 45MB). Write a descriptive title and add 25–40 keywords. The first 10 keywords carry the most search weight — choose wisely.</p>
+        </div>
+      </div>
+
+      <div class="step-card" style="animation-delay:0.25s">
+        <div class="step-num">06</div>
+        <div class="step-body">
+          <div class="step-head">
+            <span class="step-title">Wait for Review</span>
+            <span class="badge badge-ong">Ongoing</span>
+          </div>
+          <p class="step-detail">Adobe moderates every submission for quality and compliance. Expect 5–15 days. Approved assets go live to millions of Creative Cloud users worldwide.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- What sells -->
+    <div class="info-block" style="margin-top:16px">
+      <h3>📈 What Sells Best on Adobe Stock</h3>
+      <div class="tags-wrap">
+        <span class="tag-pill">Diverse people &amp; teams</span>
+        <span class="tag-pill">Remote work / tech</span>
+        <span class="tag-pill">Small business</span>
+        <span class="tag-pill">Nature &amp; sustainability</span>
+        <span class="tag-pill">Health &amp; wellness</span>
+        <span class="tag-pill">Food &amp; lifestyle</span>
+        <span class="tag-pill">Aerial / drone shots</span>
+        <span class="tag-pill">Seasonal &amp; holidays</span>
+        <span class="tag-pill">Architecture</span>
+        <span class="tag-pill">Authentic emotions</span>
+      </div>
+    </div>
+
+    <!-- Pro tips -->
+    <div class="info-block">
+      <h3>💡 Pro Tips for More Sales</h3>
+      <div class="tip-row"><span>✓</span><span>Your first 10 keywords rank highest — choose them with care every time</span></div>
+      <div class="tip-row"><span>✓</span><span>Always get model releases for recognisable people before uploading</span></div>
+      <div class="tip-row"><span>✓</span><span>Never add filters, watermarks, or branding before submitting</span></div>
+      <div class="tip-row"><span>✓</span><span>Adobe Stock is non-exclusive — you can sell the same images on Shutterstock simultaneously</span></div>
+      <div class="tip-row"><span>✓</span><span>Upload consistently — a large, growing portfolio compounds earnings over time</span></div>
+      <div class="tip-row"><span>✓</span><span>Active contributors who hit milestones receive free Adobe Creative Cloud access</span></div>
+    </div>
+
+  </div><!-- /setup panel -->
+</div><!-- /wrap -->
+
+<script>
+  // ── TAB SWITCHING ──
+  function switchTab(name) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0) === (name === 'analyze'));
+    });
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+  }
+
+  // ── FILE HANDLING ──
+  let imageBase64 = null;
+  let imageMediaType = 'image/jpeg';
+
+  function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) loadFile(file);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    document.getElementById('dropzone').classList.add('dragover');
+  }
+
+  function handleDragLeave() {
+    document.getElementById('dropzone').classList.remove('dragover');
+  }
+
+  function handleDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropzone').classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) loadFile(file);
+  }
+
+  function loadFile(file) {
+    imageMediaType = file.type || 'image/jpeg';
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      imageBase64 = ev.target.result.split(',')[1];
+      const preview = document.getElementById('preview');
+      preview.src = ev.target.result;
+      preview.style.display = 'block';
+      document.getElementById('dz-icon').style.display = 'none';
+      document.getElementById('dz-text').style.display = 'none';
+      document.getElementById('dz-sub').style.display = 'none';
+      document.getElementById('analyzeBtn').disabled = false;
+      document.getElementById('results').style.display = 'none';
+      document.getElementById('error-box').style.display = 'none';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ── SCORE COLORS ──
+  function scoreColor(s) {
+    if (s >= 75) return '#3dd68c';
+    if (s >= 50) return '#f5c842';
+    return '#f05a5a';
+  }
+
+  function verdictStyle(v) {
+    const map = {
+      Excellent: { bg: '#0d2a1a', border: '#2a6a4a', color: '#3dd68c' },
+      Good:      { bg: '#2a2a0d', border: '#6a6a2a', color: '#f5c842' },
+      Fair:      { bg: '#2a1a0d', border: '#6a4a2a', color: '#f0894a' },
+      Poor:      { bg: '#2a0d0d', border: '#6a2a2a', color: '#f05a5a' }
+    };
+    return map[v] || map.Poor;
+  }
+
+  // ── MAIN ANALYZER ──
+  async function analyzePhoto() {
+    if (!imageBase64) return;
+
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error-box').style.display = 'none';
+
+    const prompt = `You are an expert Adobe Stock photo analyst. Analyze this photo and return ONLY a JSON object (no markdown, no backticks, no extra text) with this exact structure:
+{
+  "score": <number 1-100>,
+  "verdict": "<Excellent|Good|Fair|Poor>",
+  "summary": "<2 sentence plain English summary of this photo's commercial appeal on stock sites>",
+  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
+  "issues": ["<issue 1>", "<issue 2>"],
+  "topKeywords": ["<kw1>","<kw2>","<kw3>","<kw4>","<kw5>","<kw6>","<kw7>","<kw8>"],
+  "bestCategories": ["<category1>", "<category2>"],
+  "releaseNeeded": "<None|Model Release|Property Release|Both>",
+  "improvementTip": "<One specific, actionable tip to increase sales potential>"
+}
+
+Score on: technical quality (focus, exposure, noise), commercial appeal, composition, subject demand, uniqueness vs oversaturation on stock sites.`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: imageMediaType, data: imageBase64 } },
+              { type: 'text', text: prompt }
+            ]
+          }]
+        })
+      });
+
+      const data = await res.json();
+      const text = (data.content || []).map(i => i.text || '').join('');
+      const clean = text.replace(/```json|```/g, '').trim();
+      const r = JSON.parse(clean);
+      renderResults(r);
+
+    } catch (err) {
+      const eb = document.getElementById('error-box');
+      eb.textContent = 'Analysis failed — please try again or use a different image.';
+      eb.style.display = 'block';
+    } finally {
+      document.getElementById('loading').style.display = 'none';
+      document.getElementById('analyzeBtn').disabled = false;
+    }
+  }
+
+  function renderResults(r) {
+    // Score
+    const sc = document.getElementById('res-score');
+    sc.textContent = r.score;
+    sc.style.color = scoreColor(r.score);
+
+    // Verdict
+    const vs = verdictStyle(r.verdict);
+    const vp = document.getElementById('res-verdict');
+    vp.textContent = r.verdict;
+    vp.style.cssText = `background:${vs.bg}; border:1px solid ${vs.border}; color:${vs.color};`;
+
+    document.getElementById('res-summary').textContent = r.summary;
+
+    // Strengths
+    document.getElementById('res-strengths').innerHTML =
+      (r.strengths || []).map(s => `<div class="rc-item">• ${s}</div>`).join('');
+
+    // Issues
+    const issues = (r.issues || []).filter(Boolean);
+    document.getElementById('res-issues').innerHTML = issues.length
+      ? issues.map(s => `<div class="rc-item">• ${s}</div>`).join('')
+      : '<div class="rc-item" style="color:var(--green)">None detected ✓</div>';
+
+    // Keywords
+    document.getElementById('res-keywords').innerHTML =
+      (r.topKeywords || []).map((kw, i) =>
+        `<span class="kw-pill ${i < 3 ? 'kw-top' : 'kw-norm'}">${kw}${i < 3 ? ' ★' : ''}</span>`
+      ).join('');
+
+    // Release
+    const relEl = document.getElementById('res-release');
+    relEl.textContent = r.releaseNeeded;
+    relEl.style.color = r.releaseNeeded === 'None' ? 'var(--green)' : 'var(--yellow)';
+
+    // Categories
+    document.getElementById('res-categories').innerHTML =
+      (r.bestCategories || []).map(c => `<div class="rc-item" style="font-weight:600;color:#b0b0d8">• ${c}</div>`).join('');
+
+    document.getElementById('res-tip').textContent = r.improvementTip;
+
+    document.getElementById('results').style.display = 'block';
+    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function resetAnalyzer() {
+    imageBase64 = null;
+    document.getElementById('preview').style.display = 'none';
+    document.getElementById('dz-icon').style.display = 'block';
+    document.getElementById('dz-text').style.display = 'block';
+    document.getElementById('dz-sub').style.display = 'block';
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('error-box').style.display = 'none';
+    document.getElementById('fileInput').value = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+</body>
+</html>
