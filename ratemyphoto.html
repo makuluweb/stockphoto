@@ -515,11 +515,104 @@
     to { transform: rotate(360deg); }
   }
 
+  /* ── API KEY GATE ── */
+  #api-gate {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 28px 22px;
+    margin: 24px 0 16px;
+    animation: fadeUp 0.4s ease both;
+  }
+
+  #api-gate h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  #api-gate p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 16px;
+  }
+
+  #api-gate a { color: var(--accent); }
+
+  .key-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  #apiKeyInput {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  #apiKeyInput:focus { border-color: var(--accent); }
+  #apiKeyInput::placeholder { color: var(--faint); }
+
+  .btn-save-key {
+    padding: 11px 18px;
+    border-radius: 10px;
+    background: var(--accent2);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+
+  .btn-save-key:hover { opacity: 0.85; }
+
+  .key-note {
+    font-size: 11px;
+    color: var(--faint);
+    margin-top: 10px;
+  }
+
+  .key-set-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0d1f10;
+    border: 1px solid #1a4a20;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin: 14px 0 16px;
+    font-size: 13px;
+    color: var(--green);
+  }
+
+  .key-set-bar button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
   /* ── MOBILE ── */
   @media (max-width: 480px) {
     .stat-bar { grid-template-columns: repeat(2, 1fr); }
     .grid2 { grid-template-columns: 1fr; }
     h1 { font-size: 26px; }
+    .key-row { flex-direction: column; }
   }
 </style>
 </head>
@@ -541,6 +634,31 @@
 
   <!-- ══ ANALYZE PANEL ══ -->
   <div class="panel active" id="panel-analyze">
+
+    <!-- API Key Gate -->
+    <div id="api-gate" style="background:var(--surface);border:1px solid var(--border2);border-radius:16px;padding:26px 20px;margin:22px 0 14px;animation:fadeUp 0.4s ease both;">
+      <h2 style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:8px;">🔑 Enter your Anthropic API Key</h2>
+      <p style="font-size:13px;color:var(--muted);line-height:1.55;margin-bottom:16px;">
+        This tool calls the Claude API to analyse your photos. Your key is only stored in memory for this session — never saved or sent anywhere except directly to Anthropic.<br><br>
+        Get a free key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent);">console.anthropic.com</a> → API Keys.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off"
+          onkeydown="if(event.key==='Enter') saveKey()"
+          style="flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;outline:none;" />
+        <button onclick="saveKey()"
+          style="padding:11px 20px;border-radius:10px;background:var(--accent2);color:#fff;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;border:none;cursor:pointer;">
+          Save Key
+        </button>
+      </div>
+      <div style="font-size:11px;color:var(--faint);margin-top:10px;">🔒 Key lives in memory only — cleared when you close this tab.</div>
+    </div>
+
+    <!-- Key confirmed bar -->
+    <div id="key-set-bar" style="display:none;align-items:center;justify-content:space-between;background:#0d1f10;border:1px solid #1a4a20;border-radius:10px;padding:10px 14px;margin:14px 0 4px;font-size:13px;color:var(--green);">
+      ✓ API key active — ready to analyse
+      <button onclick="clearKey()" style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;">Change</button>
+    </div>
 
     <!-- Drop zone -->
     <div id="dropzone" onclick="document.getElementById('fileInput').click()"
@@ -732,6 +850,29 @@
 </div><!-- /wrap -->
 
 <script>
+  // ── API KEY MANAGEMENT ──
+  let apiKey = null;
+
+  function saveKey() {
+    const val = document.getElementById('apiKeyInput').value.trim();
+    if (!val.startsWith('sk-ant-')) {
+      showError('That doesn\'t look like a valid Anthropic API key — it should start with sk-ant-');
+      return;
+    }
+    apiKey = val;
+    document.getElementById('api-gate').style.display = 'none';
+    const bar = document.getElementById('key-set-bar');
+    bar.style.display = 'flex';
+    hideError();
+  }
+
+  function clearKey() {
+    apiKey = null;
+    document.getElementById('apiKeyInput').value = '';
+    document.getElementById('api-gate').style.display = 'block';
+    document.getElementById('key-set-bar').style.display = 'none';
+  }
+
   // ── TAB SWITCHING ──
   function switchTab(name) {
     document.querySelectorAll('.tab').forEach((t, i) => {
@@ -779,9 +920,20 @@
       document.getElementById('dz-sub').style.display = 'none';
       document.getElementById('analyzeBtn').disabled = false;
       document.getElementById('results').style.display = 'none';
-      document.getElementById('error-box').style.display = 'none';
+      hideError();
     };
     reader.readAsDataURL(file);
+  }
+
+  // ── ERROR HELPERS ──
+  function showError(msg) {
+    const eb = document.getElementById('error-box');
+    eb.innerHTML = msg;
+    eb.style.display = 'block';
+  }
+
+  function hideError() {
+    document.getElementById('error-box').style.display = 'none';
   }
 
   // ── SCORE COLORS ──
@@ -805,10 +957,15 @@
   async function analyzePhoto() {
     if (!imageBase64) return;
 
+    if (!apiKey) {
+      showError('Please enter your Anthropic API key above before analysing.');
+      return;
+    }
+
     document.getElementById('analyzeBtn').disabled = true;
     document.getElementById('loading').style.display = 'block';
     document.getElementById('results').style.display = 'none';
-    document.getElementById('error-box').style.display = 'none';
+    hideError();
 
     const prompt = `You are an expert Adobe Stock photo analyst. Analyze this photo and return ONLY a JSON object (no markdown, no backticks, no extra text) with this exact structure:
 {
@@ -828,9 +985,14 @@ Score on: technical quality (focus, exposure, noise), commercial appeal, composi
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-opus-4-5',
           max_tokens: 1000,
           messages: [{
             role: 'user',
@@ -843,15 +1005,37 @@ Score on: technical quality (focus, exposure, noise), commercial appeal, composi
       });
 
       const data = await res.json();
+
+      // Catch API-level errors (wrong key, quota, etc.)
+      if (data.error) {
+        const msg = data.error.message || 'Unknown API error';
+        const type = data.error.type || '';
+        if (type === 'authentication_error') {
+          showError('❌ Invalid API key. Double-check your key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>.');
+        } else if (type === 'rate_limit_error') {
+          showError('⏳ Rate limit hit — wait a moment then try again.');
+        } else if (type === 'overloaded_error') {
+          showError('⚙️ Claude is busy right now — try again in a few seconds.');
+        } else {
+          showError('API error: ' + msg);
+        }
+        return;
+      }
+
       const text = (data.content || []).map(i => i.text || '').join('');
+      if (!text) throw new Error('Empty response from API');
+
       const clean = text.replace(/```json|```/g, '').trim();
       const r = JSON.parse(clean);
       renderResults(r);
 
     } catch (err) {
-      const eb = document.getElementById('error-box');
-      eb.textContent = 'Analysis failed — please try again or use a different image.';
-      eb.style.display = 'block';
+      console.error(err);
+      if (err instanceof SyntaxError) {
+        showError('⚠️ Couldn\'t parse the AI response. Please try again.');
+      } else {
+        showError('❌ Request failed: ' + err.message + '<br><small>Check your internet connection and API key.</small>');
+      }
     } finally {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('analyzeBtn').disabled = false;
@@ -859,12 +1043,10 @@ Score on: technical quality (focus, exposure, noise), commercial appeal, composi
   }
 
   function renderResults(r) {
-    // Score
     const sc = document.getElementById('res-score');
     sc.textContent = r.score;
     sc.style.color = scoreColor(r.score);
 
-    // Verdict
     const vs = verdictStyle(r.verdict);
     const vp = document.getElementById('res-verdict');
     vp.textContent = r.verdict;
@@ -872,28 +1054,23 @@ Score on: technical quality (focus, exposure, noise), commercial appeal, composi
 
     document.getElementById('res-summary').textContent = r.summary;
 
-    // Strengths
     document.getElementById('res-strengths').innerHTML =
       (r.strengths || []).map(s => `<div class="rc-item">• ${s}</div>`).join('');
 
-    // Issues
     const issues = (r.issues || []).filter(Boolean);
     document.getElementById('res-issues').innerHTML = issues.length
       ? issues.map(s => `<div class="rc-item">• ${s}</div>`).join('')
       : '<div class="rc-item" style="color:var(--green)">None detected ✓</div>';
 
-    // Keywords
     document.getElementById('res-keywords').innerHTML =
       (r.topKeywords || []).map((kw, i) =>
         `<span class="kw-pill ${i < 3 ? 'kw-top' : 'kw-norm'}">${kw}${i < 3 ? ' ★' : ''}</span>`
       ).join('');
 
-    // Release
     const relEl = document.getElementById('res-release');
     relEl.textContent = r.releaseNeeded;
     relEl.style.color = r.releaseNeeded === 'None' ? 'var(--green)' : 'var(--yellow)';
 
-    // Categories
     document.getElementById('res-categories').innerHTML =
       (r.bestCategories || []).map(c => `<div class="rc-item" style="font-weight:600;color:#b0b0d8">• ${c}</div>`).join('');
 
@@ -911,7 +1088,7 @@ Score on: technical quality (focus, exposure, noise), commercial appeal, composi
     document.getElementById('dz-sub').style.display = 'block';
     document.getElementById('analyzeBtn').disabled = true;
     document.getElementById('results').style.display = 'none';
-    document.getElementById('error-box').style.display = 'none';
+    hideError();
     document.getElementById('fileInput').value = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
