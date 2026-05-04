@@ -1472,14 +1472,34 @@ Required JSON structure:
 
       let y = 18;
 
-      // Thumbnail — constrain to max 65mm tall, proportional
+      // Thumbnail — load image to get real dimensions, render in true proportion
       if (p.thumb) {
         try {
-          const imgW = PW - MARGIN*2;
-          const imgH = Math.min(65, imgW * 0.55); // ~16:9ish max
-          doc.addImage(p.thumb, 'JPEG', MARGIN, y, imgW, imgH, undefined, 'MEDIUM');
-          y += imgH + 5;
-        } catch(e) { /* skip image if corrupt */ y += 5; }
+          await new Promise((resolve) => {
+            const img = new Image();
+            img.onload = () => {
+              const maxW = PW - MARGIN*2;
+              const maxH = 110; // max height in mm
+              const ratio = img.naturalHeight / img.naturalWidth;
+              let imgW = maxW;
+              let imgH = imgW * ratio;
+              // if too tall, constrain by height instead
+              if (imgH > maxH) {
+                imgH = maxH;
+                imgW = imgH / ratio;
+              }
+              // centre horizontally
+              const imgX = MARGIN + (maxW - imgW) / 2;
+              try {
+                doc.addImage(p.thumb, 'JPEG', imgX, y, imgW, imgH, undefined, 'MEDIUM');
+                y += imgH + 5;
+              } catch(e) { y += 5; }
+              resolve();
+            };
+            img.onerror = () => { y += 5; resolve(); };
+            img.src = p.thumb;
+          });
+        } catch(e) { y += 5; }
       }
 
       // Score bar
