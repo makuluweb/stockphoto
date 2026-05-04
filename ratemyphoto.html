@@ -942,7 +942,12 @@
   <!-- ══ ALBUMS PANEL ══ -->
   <div class="panel" id="panel-albums">
     <div style="margin-top:20px">
-      <div id="no-albums-msg" class="no-albums">
+      <!-- JSON import/export toolbar -->
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:16px;flex-wrap:wrap;">
+        <button onclick="importJSON()" style="padding:9px 14px;border-radius:10px;background:#0e0e1c;border:1px solid #282848;color:#b0b0d8;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">⬆ Import JSON</button>
+        <button onclick="exportJSON()" style="padding:9px 14px;border-radius:10px;background:#0e0e1c;border:1px solid #282848;color:#b0b0d8;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">⬇ Export JSON</button>
+      </div>
+        <div id="no-albums-msg" class="no-albums">
         <div style="font-size:36px;margin-bottom:12px">📁</div>
         <div>No albums yet.</div>
         <div style="font-size:12px;margin-top:6px;color:#3a3a58">Analyse a photo and add it to an album to get started.</div>
@@ -1330,197 +1335,245 @@ Required JSON structure:
     renderAlbumsPanel();
   }
 
-  // ── PDF EXPORT ──
+  // ── JSON EXPORT ──
+  function exportJSON() {
+    const data = JSON.stringify(albums, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ratemyphoto-albums.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── JSON IMPORT ──
+  function importJSON() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json,application/json';
+    input.onchange = function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        try {
+          const imported = JSON.parse(ev.target.result);
+          // Validate it looks like our album structure
+          if (typeof imported !== 'object' || Array.isArray(imported)) throw new Error('Invalid format');
+          // Merge into existing albums
+          let added = 0, merged = 0;
+          Object.keys(imported).forEach(name => {
+            if (!Array.isArray(imported[name])) return;
+            if (albums[name]) {
+              albums[name] = albums[name].concat(imported[name]);
+              merged++;
+            } else {
+              albums[name] = imported[name];
+              added++;
+            }
+          });
+          saveAlbums();
+          renderAlbumsPanel();
+          alert(`Import complete: ${added} new album${added!==1?'s':''} added, ${merged} merged.`);
+        } catch(err) {
+          alert('Import failed — file does not appear to be a valid Rate My Photo export.\n\n' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+
+  // ── PDF EXPORT (fixed) ──
   async function exportAlbumPDF(albumName) {
     const photos = albums[albumName];
     if (!photos || photos.length === 0) { alert('No photos in this album.'); return; }
 
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-    const PW = 210, PH = 297;
-    const MARGIN = 14;
-    const COL = (PW - MARGIN * 3) / 2; // two columns
-    const dark = [8,8,15], surface = [14,14,28], accent = [91,143,255];
-    const textMain = [228,228,240], textMuted = [106,106,144];
+    const PW = 210, PH = 297, MARGIN = 14;
+
+    // colour helpers — always pass arrays explicitly
+    const C = {
+      dark:    [8,   8,  15],
+      surface: [14, 14,  28],
+      surface2:[19, 19,  37],
+      accent:  [91,143, 255],
+      green:   [61, 214,140],
+      yellow:  [245,200, 66],
+      red:     [240, 90, 90],
+      textMain:[228,228,240],
+      textMuted:[106,106,144],
+      strBg:   [13,  42, 26],
+      issBg:   [42,  13, 13],
+      tipBg:   [10,  21, 48],
+      kwTop:   [13,  26, 56],
+      kwTopTxt:[122,174,255],
+      kwNrmTxt:[144,144,184],
+    };
+
+    const setFill  = (c) => doc.setFillColor(c[0], c[1], c[2]);
+    const setTxt   = (c) => doc.setTextColor(c[0], c[1], c[2]);
+    const sColor   = (s) => s >= 75 ? C.green : s >= 50 ? C.yellow : C.red;
+    const rColor   = (r) => r === 'None' ? C.green : C.yellow;
 
     // ── COVER PAGE ──
-    doc.setFillColor(...dark);
-    doc.rect(0, 0, PW, PH, 'F');
+    setFill(C.dark); doc.rect(0, 0, PW, PH, 'F');
+    setFill(C.accent); doc.rect(0, 0, PW, 3, 'F');
 
-    // accent bar
-    doc.setFillColor(...accent);
-    doc.rect(0, 0, PW, 3, 'F');
-
-    // Title
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(28);
-    doc.setTextColor(...textMain);
+    doc.setFont('helvetica','bold'); doc.setFontSize(28); setTxt(C.textMain);
     doc.text(albumName, PW/2, 90, { align:'center' });
 
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(12);
-    doc.setTextColor(...textMuted);
+    doc.setFont('helvetica','normal'); doc.setFontSize(12); setTxt(C.textMuted);
     doc.text('Adobe Stock Photo Analysis Report', PW/2, 102, { align:'center' });
-
     doc.setFontSize(10);
-    doc.text(`${photos.length} photo${photos.length!==1?'s':''} · Generated ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}`, PW/2, 112, { align:'center' });
+    doc.text(
+      `${photos.length} photo${photos.length!==1?'s':''} · Generated ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}`,
+      PW/2, 112, { align:'center' }
+    );
 
-    // stats summary
-    const avgScore = Math.round(photos.reduce((a,p) => a+p.score, 0) / photos.length);
+    const avgScore  = Math.round(photos.reduce((a,p) => a+p.score, 0) / photos.length);
     const excellent = photos.filter(p=>p.verdict==='Excellent').length;
-    const good = photos.filter(p=>p.verdict==='Good').length;
+    const good      = photos.filter(p=>p.verdict==='Good').length;
 
-    doc.setFillColor(...surface);
-    doc.roundedRect(MARGIN, 130, PW-MARGIN*2, 50, 4, 4, 'F');
-    doc.setFont('helvetica','bold');
-    doc.setFontSize(24);
-    doc.setTextColor(...accent);
-    doc.text(String(avgScore), PW/2, 155, { align:'center' });
-    doc.setFont('helvetica','normal');
-    doc.setFontSize(9);
-    doc.setTextColor(...textMuted);
-    doc.text('Average Score', PW/2, 162, { align:'center' });
+    setFill(C.surface); doc.roundedRect(MARGIN, 128, PW-MARGIN*2, 56, 4, 4, 'F');
+    doc.setFont('helvetica','bold'); doc.setFontSize(26); setTxt(C.accent);
+    doc.text(String(avgScore), PW/2, 152, { align:'center' });
+    doc.setFont('helvetica','normal'); doc.setFontSize(9); setTxt(C.textMuted);
+    doc.text('Average Score', PW/2, 160, { align:'center' });
 
-    const statX = [55, PW/2, PW-55];
-    const statV = [String(excellent), String(good), String(photos.length)];
-    const statL = ['Excellent', 'Good', 'Total Photos'];
-    statX.forEach((x,i) => {
-      doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(...textMain);
-      doc.text(statV[i], x, 175, {align:'center'});
-      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...textMuted);
-      doc.text(statL[i], x, 181, {align:'center'});
+    [[55,'Excellent',excellent],[PW/2,'Good',good],[PW-55,'Total',photos.length]].forEach(([x,lbl,val]) => {
+      doc.setFont('helvetica','bold'); doc.setFontSize(18); setTxt(C.textMain);
+      doc.text(String(val), x, 174, { align:'center' });
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); setTxt(C.textMuted);
+      doc.text(lbl, x, 180, { align:'center' });
     });
 
-    doc.setFillColor(...accent);
-    doc.rect(0, PH-3, PW, 3, 'F');
+    setFill(C.accent); doc.rect(0, PH-3, PW, 3, 'F');
+    doc.setFont('helvetica','normal'); doc.setFontSize(7); setTxt(C.textMuted);
+    doc.text('Rate My Photo · Adobe Stock Analyzer', PW/2, PH-6, { align:'center' });
 
     // ── PHOTO PAGES ──
+    const colW = (PW - MARGIN*3) / 2;
+    const issX = MARGIN + colW + MARGIN;
+
     for (let i = 0; i < photos.length; i++) {
       const p = photos[i];
       doc.addPage();
+      setFill(C.dark); doc.rect(0, 0, PW, PH, 'F');
+      setFill(C.accent); doc.rect(0, 0, PW, 2, 'F');
 
-      // dark bg
-      doc.setFillColor(...dark);
-      doc.rect(0, 0, PW, PH, 'F');
-      doc.setFillColor(...accent);
-      doc.rect(0, 0, PW, 2, 'F');
+      // Page header
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(C.accent);
+      doc.text(albumName.toUpperCase(), MARGIN, 11);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); setTxt(C.textMuted);
+      doc.text(`Photo ${i+1} of ${photos.length} · ${p.date}`, PW-MARGIN, 11, { align:'right' });
 
-      // Header
-      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...accent);
-      doc.text(albumName.toUpperCase(), MARGIN, 12);
-      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...textMuted);
-      doc.text(`Photo ${i+1} of ${photos.length} · ${p.date}`, PW-MARGIN, 12, {align:'right'});
+      let y = 18;
 
-      let y = 20;
+      // Thumbnail — constrain to max 65mm tall, proportional
+      if (p.thumb) {
+        try {
+          const imgW = PW - MARGIN*2;
+          const imgH = Math.min(65, imgW * 0.55); // ~16:9ish max
+          doc.addImage(p.thumb, 'JPEG', MARGIN, y, imgW, imgH, undefined, 'MEDIUM');
+          y += imgH + 5;
+        } catch(e) { /* skip image if corrupt */ y += 5; }
+      }
 
-      // Thumbnail
-      try {
-        const imgH = 70;
-        doc.addImage(p.thumb, 'JPEG', MARGIN, y, PW - MARGIN*2, imgH, undefined, 'MEDIUM');
-        y += imgH + 6;
-      } catch(e) { y += 6; }
-
-      // Score row
-      const sColor = p.score >= 75 ? [61,214,140] : p.score >= 50 ? [245,200,66] : [240,90,90];
-      doc.setFillColor(...surface);
-      doc.roundedRect(MARGIN, y, PW-MARGIN*2, 18, 3, 3, 'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(...sColor);
-      doc.text(String(p.score), MARGIN+8, y+12);
-      doc.setFontSize(8); doc.setTextColor(...textMuted);
-      doc.text('/ 100  Stock Potential', MARGIN+20, y+12);
-      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...sColor);
-      doc.text(p.verdict, PW-MARGIN-4, y+12, {align:'right'});
-      y += 24;
+      // Score bar
+      const sc = sColor(p.score);
+      setFill(C.surface); doc.roundedRect(MARGIN, y, PW-MARGIN*2, 16, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(16); setTxt(sc);
+      doc.text(String(p.score), MARGIN+6, y+11);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); setTxt(C.textMuted);
+      doc.text('/ 100  Stock Potential', MARGIN+18, y+11);
+      doc.setFont('helvetica','bold'); doc.setFontSize(9); setTxt(sc);
+      doc.text(p.verdict, PW-MARGIN-3, y+11, { align:'right' });
+      y += 21;
 
       // Summary
-      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...textMain);
-      const summaryLines = doc.splitTextToSize(p.summary, PW-MARGIN*2);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8.5); setTxt(C.textMain);
+      const summaryLines = doc.splitTextToSize(p.summary || '', PW-MARGIN*2);
       doc.text(summaryLines, MARGIN, y);
-      y += summaryLines.length * 5 + 6;
+      y += summaryLines.length * 4.5 + 5;
 
-      // Two column layout: Strengths | Issues
-      const colW = (PW - MARGIN*3) / 2;
-
-      // Strengths
-      doc.setFillColor(13,42,26);
-      doc.roundedRect(MARGIN, y, colW, 32, 3, 3, 'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(61,214,140);
-      doc.text('STRENGTHS', MARGIN+4, y+6);
-      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...textMuted);
+      // Strengths | Issues (fixed height 30mm)
+      const siH = 30;
+      setFill(C.strBg); doc.roundedRect(MARGIN, y, colW, siH, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.5); setTxt(C.green);
+      doc.text('STRENGTHS', MARGIN+3, y+5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); setTxt(C.textMuted);
       (p.strengths||[]).slice(0,3).forEach((s,si) => {
-        const lines = doc.splitTextToSize('• ' + s, colW-8);
-        doc.text(lines, MARGIN+4, y+11+(si*7));
+        const lines = doc.splitTextToSize('• '+s, colW-6);
+        doc.text(lines[0], MARGIN+3, y+10+(si*6.5)); // one line per strength max
       });
 
-      // Issues
-      const issX = MARGIN + colW + MARGIN;
-      doc.setFillColor(42,13,13);
-      doc.roundedRect(issX, y, colW, 32, 3, 3, 'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(240,90,90);
-      doc.text('ISSUES', issX+4, y+6);
-      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...textMuted);
-      const issuesList = (p.issues||[]).filter(x=>x&&x!=='None');
-      if (issuesList.length === 0) {
-        doc.setTextColor(61,214,140); doc.text('None detected', issX+4, y+13);
+      setFill(C.issBg); doc.roundedRect(issX, y, colW, siH, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.5); setTxt(C.red);
+      doc.text('ISSUES', issX+3, y+5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); setTxt(C.textMuted);
+      const issFiltered = (p.issues||[]).filter(x=>x&&x!=='None');
+      if (issFiltered.length === 0) {
+        setTxt(C.green); doc.text('None detected ✓', issX+3, y+12);
       } else {
-        issuesList.slice(0,2).forEach((s,si) => {
-          const lines = doc.splitTextToSize('• ' + s, colW-8);
-          doc.text(lines, issX+4, y+11+(si*7));
+        issFiltered.slice(0,2).forEach((s,si) => {
+          doc.text(doc.splitTextToSize('• '+s, colW-6)[0], issX+3, y+10+(si*6.5));
         });
       }
-      y += 38;
+      y += siH + 5;
 
       // Keywords
-      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
-      doc.text('KEYWORDS', MARGIN, y+4);
-      y += 8;
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.5); setTxt(C.accent);
+      doc.text('KEYWORDS', MARGIN, y+3);
+      y += 7;
       let kx = MARGIN;
-      (p.keywords||[]).forEach((kw,ki) => {
-        const kw_text = kw + (ki < 3 ? ' *' : '');
-        const tw = doc.getTextWidth(kw_text) + 6;
-        if (kx + tw > PW - MARGIN) { kx = MARGIN; y += 8; }
-        doc.setFillColor(ki<3?[13,26,56]:[19,19,37]);
-        doc.setFillColor(...(ki<3?[13,26,56]:[19,19,37]));
-        doc.roundedRect(kx, y-4, tw, 7, 2, 2, 'F');
-        doc.setFont('helvetica', ki<3?'bold':'normal');
-        doc.setFontSize(7);
-        doc.setTextColor(...(ki<3?[122,174,255]:[144,144,184]));
-        doc.text(kw_text, kx+3, y+1);
-        kx += tw + 3;
+      const kwStartY = y;
+      (p.keywords||[]).forEach((kw, ki) => {
+        const label = kw + (ki < 3 ? ' *' : '');
+        const tw = doc.getTextWidth(label) + 5;
+        if (kx + tw > PW - MARGIN) { kx = MARGIN; y += 7; }
+        setFill(ki < 3 ? C.kwTop : C.surface2);
+        doc.roundedRect(kx, y-3.5, tw, 6, 1.5, 1.5, 'F');
+        doc.setFont('helvetica', ki < 3 ? 'bold' : 'normal');
+        doc.setFontSize(6.5);
+        setTxt(ki < 3 ? C.kwTopTxt : C.kwNrmTxt);
+        doc.text(label, kx+2.5, y+1);
+        kx += tw + 2;
       });
-      y += 12;
+      y += 10;
 
       // Release & Categories
-      doc.setFillColor(...surface);
-      doc.roundedRect(MARGIN, y, colW, 14, 3, 3, 'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...textMuted);
-      doc.text('RELEASE NEEDED', MARGIN+4, y+5);
-      const rColor = p.release==='None'?[61,214,140]:[245,200,66];
-      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...rColor);
-      doc.text(p.release, MARGIN+4, y+11);
+      const rcH = 16;
+      setFill(C.surface); doc.roundedRect(MARGIN, y, colW, rcH, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.5); setTxt(C.textMuted);
+      doc.text('RELEASE NEEDED', MARGIN+3, y+5);
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); setTxt(rColor(p.release));
+      doc.text(p.release||'None', MARGIN+3, y+12);
 
-      doc.setFillColor(...surface);
-      doc.roundedRect(issX, y, colW, 14, 3, 3, 'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...textMuted);
-      doc.text('BEST CATEGORIES', issX+4, y+5);
-      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...textMain);
-      (p.categories||[]).forEach((c,ci) => doc.text('• ' + c, issX+4, y+10+(ci*5)));
-      y += 20;
+      setFill(C.surface); doc.roundedRect(issX, y, colW, rcH, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.5); setTxt(C.textMuted);
+      doc.text('BEST CATEGORIES', issX+3, y+5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); setTxt(C.textMain);
+      (p.categories||[]).slice(0,2).forEach((c,ci) => doc.text('• '+c, issX+3, y+10+(ci*5)));
+      y += rcH + 5;
 
-      // Improvement tip
-      doc.setFillColor(10,21,48);
-      doc.roundedRect(MARGIN, y, PW-MARGIN*2, 20, 3, 3, 'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
-      doc.text('IMPROVEMENT TIP', MARGIN+4, y+6);
-      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...textMuted);
-      const tipLines = doc.splitTextToSize(p.tip, PW-MARGIN*2-8);
-      doc.text(tipLines, MARGIN+4, y+12);
+      // Improvement tip — dynamic height
+      const tipLines = doc.splitTextToSize(p.tip||'', PW-MARGIN*2-6);
+      const tipH = Math.max(16, tipLines.length * 4.5 + 10);
+      // guard against overflow
+      if (y + tipH > PH - 12) { y = PH - 12 - tipH; }
+      setFill(C.tipBg); doc.roundedRect(MARGIN, y, PW-MARGIN*2, tipH, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(6.5); setTxt(C.accent);
+      doc.text('IMPROVEMENT TIP', MARGIN+3, y+5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); setTxt(C.textMuted);
+      doc.text(tipLines, MARGIN+3, y+11);
 
-      // footer
-      doc.setFillColor(...accent);
-      doc.rect(0, PH-2, PW, 2, 'F');
-      doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...textMuted);
-      doc.text('Rate My Photo · Adobe Stock Analyzer', PW/2, PH-5, {align:'center'});
+      // Footer
+      setFill(C.accent); doc.rect(0, PH-2, PW, 2, 'F');
+      doc.setFont('helvetica','normal'); doc.setFontSize(6.5); setTxt(C.textMuted);
+      doc.text('Rate My Photo · Adobe Stock Analyzer', PW/2, PH-5, { align:'center' });
     }
 
     doc.save(`${albumName.replace(/\s+/g,'-')}-stock-analysis.pdf`);
