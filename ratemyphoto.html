@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rate My Photo — Adobe Stock Analyzer</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root {
     --bg: #08080f;
@@ -607,12 +608,87 @@
     text-decoration: underline;
   }
 
+  /* ── ALBUM UI ── */
+  .album-box {
+    background: linear-gradient(135deg, #0d1a38, #0d2040);
+    border: 1px solid #1e3a6e;
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 12px;
+  }
+  .album-box h3 { font-family:'Syne',sans-serif; font-size:14px; font-weight:700; color:#fff; margin-bottom:12px; }
+  .album-input-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+  .album-input {
+    flex:1; min-width:160px;
+    background:#08080f; border:1px solid #282848; border-radius:10px;
+    padding:10px 14px; color:#e4e4f0; font-family:'DM Sans',sans-serif; font-size:13px; outline:none;
+  }
+  .album-input:focus { border-color:#5b8fff; }
+  .btn-album {
+    padding:10px 18px; border-radius:10px;
+    background:#1e3870; border:1px solid #2a4a8a; color:#5b8fff;
+    font-family:'DM Sans',sans-serif; font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;
+    transition:background 0.2s;
+  }
+  .btn-album:hover { background:#2a4a8a; }
+  .album-list { margin-top:4px; }
+  .album-option {
+    display:flex; align-items:center; gap:10px;
+    padding:8px 12px; border-radius:8px; margin-bottom:6px;
+    background:#0e0e1c; border:1px solid #1e1e38; cursor:pointer;
+    transition:border-color 0.2s;
+  }
+  .album-option:hover { border-color:#2a4a8a; }
+  .album-option input[type=radio] { accent-color:#5b8fff; }
+  .album-option label { font-size:13px; color:#b0b0d8; cursor:pointer; flex:1; }
+  .album-option .album-count { font-size:11px; color:#3a3a58; }
+  .btn-add-confirm {
+    width:100%; padding:12px; border-radius:10px; margin-top:10px;
+    background:linear-gradient(135deg,#3d6fff,#5b8fff); color:#fff;
+    font-family:'Syne',sans-serif; font-size:14px; font-weight:700; border:none; cursor:pointer;
+  }
+  .album-added-msg { font-size:12px; color:#3dd68c; margin-top:8px; text-align:center; }
+
+  /* ── ALBUM TAB ── */
+  .album-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-top:16px; }
+  .album-thumb-card {
+    background:#0e0e1c; border:1px solid #1e1e38; border-radius:12px; overflow:hidden;
+    cursor:pointer; transition:border-color 0.2s;
+  }
+  .album-thumb-card:hover { border-color:#2a4a8a; }
+  .album-thumb-card img { width:100%; height:110px; object-fit:cover; display:block; }
+  .album-thumb-info { padding:8px 10px; }
+  .album-thumb-score { font-family:'Syne',sans-serif; font-size:13px; font-weight:800; }
+  .album-thumb-verdict { font-size:10px; color:#6a6a90; margin-top:1px; }
+  .album-thumb-date { font-size:10px; color:#3a3a58; margin-top:3px; }
+
+  .album-header-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:4px; flex-wrap:wrap; gap:8px; }
+  .album-header-row h3 { font-family:'Syne',sans-serif; font-size:16px; font-weight:800; color:#fff; margin:0; }
+  .btn-export {
+    padding:9px 16px; border-radius:10px;
+    background:linear-gradient(135deg,#3d6fff,#5b8fff); color:#fff;
+    font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; border:none; cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-del-album {
+    padding:9px 14px; border-radius:10px;
+    background:#1f0d0d; border:1px solid #6a2a2a; color:#f05a5a;
+    font-family:'DM Sans',sans-serif; font-size:12px; font-weight:700; cursor:pointer;
+  }
+  .no-albums { text-align:center; padding:40px 20px; color:#3a3a58; font-size:14px; }
+  .album-selector { margin-bottom:20px; }
+  .album-selector select {
+    width:100%; background:#0e0e1c; border:1px solid #282848; border-radius:10px;
+    padding:11px 14px; color:#e4e4f0; font-family:'DM Sans',sans-serif; font-size:14px; outline:none;
+  }
+
   /* ── MOBILE ── */
   @media (max-width: 480px) {
     .stat-bar { grid-template-columns: repeat(2, 1fr); }
     .grid2 { grid-template-columns: 1fr; }
     h1 { font-size: 26px; }
     .key-row { flex-direction: column; }
+    .album-grid { grid-template-columns: repeat(2,1fr); }
   }
 </style>
 </head>
@@ -630,6 +706,7 @@
   <div class="tabs">
     <button class="tab active" onclick="switchTab('analyze')">🔍 Analyze Photo</button>
     <button class="tab" onclick="switchTab('setup')">🚀 Setup Guide</button>
+    <button class="tab" onclick="switchTab('albums')">📁 Albums</button>
   </div>
 
   <!-- ══ ANALYZE PANEL ══ -->
@@ -732,7 +809,22 @@
         <p id="res-tip"></p>
       </div>
 
-      <button class="btn-ghost" onclick="resetAnalyzer()">← Analyze Another Photo</button>
+      <!-- Add to Album -->
+      <div class="album-box" id="album-box">
+        <h3>📁 Add to Album</h3>
+        <div class="album-input-row">
+          <input class="album-input" type="text" id="newAlbumName" placeholder="New album name e.g. Bird Stock" />
+          <button class="btn-album" onclick="createAlbumAndAdd()">+ New Album</button>
+        </div>
+        <div id="existing-albums-section" style="display:none">
+          <div style="font-size:12px;color:#6a6a90;margin-bottom:8px;">Or add to existing album:</div>
+          <div class="album-list" id="album-radio-list"></div>
+          <button class="btn-add-confirm" onclick="addToSelectedAlbum()">Add to Selected Album</button>
+        </div>
+        <div class="album-added-msg" id="album-added-msg" style="display:none"></div>
+      </div>
+
+      <button class="btn-ghost" onclick="resetAnalyzer()" style="margin-top:12px">← Analyze Another Photo</button>
     </div>
   </div>
 
@@ -847,9 +939,32 @@
     </div>
 
   </div><!-- /setup panel -->
+  <!-- ══ ALBUMS PANEL ══ -->
+  <div class="panel" id="panel-albums">
+    <div style="margin-top:20px">
+      <div id="no-albums-msg" class="no-albums">
+        <div style="font-size:36px;margin-bottom:12px">📁</div>
+        <div>No albums yet.</div>
+        <div style="font-size:12px;margin-top:6px;color:#3a3a58">Analyse a photo and add it to an album to get started.</div>
+      </div>
+      <div id="albums-content" style="display:none">
+        <div class="album-selector">
+          <select id="albumSelect" onchange="renderAlbumView()"></select>
+        </div>
+        <div id="album-view"></div>
+      </div>
+    </div>
+  </div>
+
 </div><!-- /wrap -->
 
 <script>
+  // ── ALBUMS DATA (in-memory, persists via localStorage) ──
+  let albums = JSON.parse(localStorage.getItem('rmp_albums') || '{}');
+  // albums = { "Bird Stock": [ { thumb, score, verdict, summary, strengths, issues, keywords, categories, release, tip, date }, ... ] }
+
+  function saveAlbums() { localStorage.setItem('rmp_albums', JSON.stringify(albums)); }
+
   // ── API KEY MANAGEMENT ──
   let apiKey = null;
 
@@ -861,8 +976,7 @@
     }
     apiKey = val;
     document.getElementById('api-gate').style.display = 'none';
-    const bar = document.getElementById('key-set-bar');
-    bar.style.display = 'flex';
+    document.getElementById('key-set-bar').style.display = 'flex';
     hideError();
   }
 
@@ -876,15 +990,18 @@
   // ── TAB SWITCHING ──
   function switchTab(name) {
     document.querySelectorAll('.tab').forEach((t, i) => {
-      t.classList.toggle('active', (i === 0) === (name === 'analyze'));
+      t.classList.toggle('active', ['analyze','setup','albums'][i] === name);
     });
     document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
     document.getElementById('panel-' + name).classList.add('active');
+    if (name === 'albums') renderAlbumsPanel();
   }
 
   // ── FILE HANDLING ──
   let imageBase64 = null;
   let imageMediaType = 'image/jpeg';
+  let currentThumb = null; // compressed thumbnail dataURL for album
+  let currentResult = null;
 
   function handleFileSelect(e) {
     const file = e.target.files[0];
@@ -909,31 +1026,29 @@
 
   function loadFile(file) {
     if (!file || !file.type.startsWith('image/')) return;
-    // Always send as JPEG so we control compression
     imageMediaType = 'image/jpeg';
-
     const reader = new FileReader();
     reader.onload = function(ev) {
       const img = new Image();
       img.onload = function() {
-        // Resize: longest side max 1600px
         const MAX = 1600;
-        let w = img.width;
-        let h = img.height;
+        let w = img.width, h = img.height;
         if (w > MAX || h > MAX) {
           if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
           else { w = Math.round(w * MAX / h); h = MAX; }
         }
         const canvas = document.createElement('canvas');
-        canvas.width = w;
-        canvas.height = h;
+        canvas.width = w; canvas.height = h;
         canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-
-        // Compress — drop quality if still over ~4MB
         let dataUrl = canvas.toDataURL('image/jpeg', 0.82);
-        if (dataUrl.length * 0.75 > 4 * 1024 * 1024) {
-          dataUrl = canvas.toDataURL('image/jpeg', 0.65);
-        }
+        if (dataUrl.length * 0.75 > 4 * 1024 * 1024) dataUrl = canvas.toDataURL('image/jpeg', 0.65);
+
+        // Also make a small thumbnail (400px wide) for albums
+        const TW = 400, TH = Math.round(h * 400 / w);
+        const tc = document.createElement('canvas');
+        tc.width = TW; tc.height = TH;
+        tc.getContext('2d').drawImage(img, 0, 0, TW, TH);
+        currentThumb = tc.toDataURL('image/jpeg', 0.75);
 
         imageBase64 = dataUrl.split(',')[1];
         const preview = document.getElementById('preview');
@@ -959,10 +1074,7 @@
     eb.innerHTML = msg;
     eb.style.display = 'block';
   }
-
-  function hideError() {
-    document.getElementById('error-box').style.display = 'none';
-  }
+  function hideError() { document.getElementById('error-box').style.display = 'none'; }
 
   // ── SCORE COLORS ──
   function scoreColor(s) {
@@ -973,10 +1085,10 @@
 
   function verdictStyle(v) {
     const map = {
-      Excellent: { bg: '#0d2a1a', border: '#2a6a4a', color: '#3dd68c' },
-      Good:      { bg: '#2a2a0d', border: '#6a6a2a', color: '#f5c842' },
-      Fair:      { bg: '#2a1a0d', border: '#6a4a2a', color: '#f0894a' },
-      Poor:      { bg: '#2a0d0d', border: '#6a2a2a', color: '#f05a5a' }
+      Excellent: { bg:'#0d2a1a', border:'#2a6a4a', color:'#3dd68c' },
+      Good:      { bg:'#2a2a0d', border:'#6a6a2a', color:'#f5c842' },
+      Fair:      { bg:'#2a1a0d', border:'#6a4a2a', color:'#f0894a' },
+      Poor:      { bg:'#2a0d0d', border:'#6a2a2a', color:'#f05a5a' }
     };
     return map[v] || map.Poor;
   }
@@ -984,31 +1096,13 @@
   // ── MAIN ANALYZER ──
   async function analyzePhoto() {
     if (!imageBase64) return;
-
-    if (!apiKey) {
-      showError('Please enter your Anthropic API key above before analysing.');
-      return;
-    }
+    if (!apiKey) { showError('Please enter your Anthropic API key above before analysing.'); return; }
 
     document.getElementById('analyzeBtn').disabled = true;
     document.getElementById('loading').style.display = 'block';
     document.getElementById('results').style.display = 'none';
+    document.getElementById('album-added-msg').style.display = 'none';
     hideError();
-
-    const prompt = `You are an expert Adobe Stock photo analyst. Analyze this photo and return ONLY a JSON object (no markdown, no backticks, no extra text) with this exact structure:
-{
-  "score": <number 1-100>,
-  "verdict": "<Excellent|Good|Fair|Poor>",
-  "summary": "<2 sentence plain English summary of this photo's commercial appeal on stock sites>",
-  "strengths": ["<strength 1>", "<strength 2>", "<strength 3>"],
-  "issues": ["<issue 1>", "<issue 2>"],
-  "topKeywords": ["<kw1>","<kw2>","<kw3>","<kw4>","<kw5>","<kw6>","<kw7>","<kw8>"],
-  "bestCategories": ["<category1>", "<category2>"],
-  "releaseNeeded": "<None|Model Release|Property Release|Both>",
-  "improvementTip": "<One specific, actionable tip to increase sales potential>"
-}
-
-Score on: technical quality (focus, exposure, noise), commercial appeal, composition, subject demand, uniqueness vs oversaturation on stock sites.`;
 
     try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1020,50 +1114,45 @@ Score on: technical quality (focus, exposure, noise), commercial appeal, composi
           'anthropic-dangerous-direct-browser-access': 'true'
         },
         body: JSON.stringify({
-          model: 'claude-opus-4-5',
-          max_tokens: 1000,
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1024,
           messages: [{
             role: 'user',
             content: [
               { type: 'image', source: { type: 'base64', media_type: imageMediaType, data: imageBase64 } },
-              { type: 'text', text: prompt }
+              { type: 'text', text: `Analyze this image for Adobe Stock commercial potential. Respond with ONLY a JSON object, nothing else — no explanation, no markdown, no code fences. Start your response with { and end with }.
+
+Required JSON structure:
+{
+  "score": <integer 1-100>,
+  "verdict": <"Excellent" or "Good" or "Fair" or "Poor">,
+  "summary": <two sentence string about commercial appeal>,
+  "strengths": [<string>, <string>, <string>],
+  "issues": [<string>, <string>],
+  "topKeywords": [<string>, <string>, <string>, <string>, <string>, <string>, <string>, <string>],
+  "bestCategories": [<string>, <string>],
+  "releaseNeeded": <"None" or "Model Release" or "Property Release" or "Both">,
+  "improvementTip": <one actionable tip string>
+}` }
             ]
           }]
         })
       });
 
       const data = await res.json();
+      if (data.error) throw new Error(`${data.error.type}: ${data.error.message}`);
+      if (!data.content || !data.content.length) throw new Error('No content returned from API');
 
-      // Catch API-level errors (wrong key, quota, etc.)
-      if (data.error) {
-        const msg = data.error.message || 'Unknown API error';
-        const type = data.error.type || '';
-        if (type === 'authentication_error') {
-          showError('❌ Invalid API key. Double-check your key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>.');
-        } else if (type === 'rate_limit_error') {
-          showError('⏳ Rate limit hit — wait a moment then try again.');
-        } else if (type === 'overloaded_error') {
-          showError('⚙️ Claude is busy right now — try again in a few seconds.');
-        } else {
-          showError('API error: ' + msg);
-        }
-        return;
-      }
+      const text = data.content.filter(b => b.type === 'text').map(b => b.text).join('').trim();
+      const start = text.indexOf('{'), end = text.lastIndexOf('}');
+      if (start === -1 || end === -1) throw new Error('No JSON in response: ' + text.slice(0, 150));
 
-      const text = (data.content || []).map(i => i.text || '').join('');
-      if (!text) throw new Error('Empty response from API');
-
-      const clean = text.replace(/```json|```/g, '').trim();
-      const r = JSON.parse(clean);
+      const r = JSON.parse(text.slice(start, end + 1));
+      currentResult = r;
       renderResults(r);
 
     } catch (err) {
-      console.error(err);
-      if (err instanceof SyntaxError) {
-        showError('⚠️ Couldn\'t parse the AI response. Please try again.');
-      } else {
-        showError('❌ Request failed: ' + err.message + '<br><small>Check your internet connection and API key.</small>');
-      }
+      showError('❌ ' + err.message);
     } finally {
       document.getElementById('loading').style.display = 'none';
       document.getElementById('analyzeBtn').disabled = false;
@@ -1071,51 +1160,383 @@ Score on: technical quality (focus, exposure, noise), commercial appeal, composi
   }
 
   function renderResults(r) {
-    const sc = document.getElementById('res-score');
-    sc.textContent = r.score;
-    sc.style.color = scoreColor(r.score);
-
     const vs = verdictStyle(r.verdict);
+    document.getElementById('res-score').textContent = r.score;
+    document.getElementById('res-score').style.color = scoreColor(r.score);
     const vp = document.getElementById('res-verdict');
     vp.textContent = r.verdict;
     vp.style.cssText = `background:${vs.bg}; border:1px solid ${vs.border}; color:${vs.color};`;
-
     document.getElementById('res-summary').textContent = r.summary;
-
-    document.getElementById('res-strengths').innerHTML =
-      (r.strengths || []).map(s => `<div class="rc-item">• ${s}</div>`).join('');
-
-    const issues = (r.issues || []).filter(Boolean);
+    document.getElementById('res-strengths').innerHTML = (r.strengths||[]).map(s => `<div class="rc-item">• ${s}</div>`).join('');
+    const issues = (r.issues||[]).filter(Boolean);
     document.getElementById('res-issues').innerHTML = issues.length
       ? issues.map(s => `<div class="rc-item">• ${s}</div>`).join('')
       : '<div class="rc-item" style="color:var(--green)">None detected ✓</div>';
-
-    document.getElementById('res-keywords').innerHTML =
-      (r.topKeywords || []).map((kw, i) =>
-        `<span class="kw-pill ${i < 3 ? 'kw-top' : 'kw-norm'}">${kw}${i < 3 ? ' ★' : ''}</span>`
-      ).join('');
-
+    document.getElementById('res-keywords').innerHTML = (r.topKeywords||[]).map((kw,i) =>
+      `<span class="kw-pill ${i<3?'kw-top':'kw-norm'}">${kw}${i<3?' ★':''}</span>`).join('');
     const relEl = document.getElementById('res-release');
     relEl.textContent = r.releaseNeeded;
     relEl.style.color = r.releaseNeeded === 'None' ? 'var(--green)' : 'var(--yellow)';
-
-    document.getElementById('res-categories').innerHTML =
-      (r.bestCategories || []).map(c => `<div class="rc-item" style="font-weight:600;color:#b0b0d8">• ${c}</div>`).join('');
-
+    document.getElementById('res-categories').innerHTML = (r.bestCategories||[]).map(c =>
+      `<div class="rc-item" style="font-weight:600;color:#b0b0d8">• ${c}</div>`).join('');
     document.getElementById('res-tip').textContent = r.improvementTip;
 
+    // Populate album UI
+    refreshAlbumBox();
+
     document.getElementById('results').style.display = 'block';
-    document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.getElementById('results').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  // ── ALBUM BOX (shown after analysis) ──
+  function refreshAlbumBox() {
+    const albumNames = Object.keys(albums);
+    const section = document.getElementById('existing-albums-section');
+    const list = document.getElementById('album-radio-list');
+    if (albumNames.length > 0) {
+      section.style.display = 'block';
+      list.innerHTML = albumNames.map(name => `
+        <div class="album-option">
+          <input type="radio" name="albumRadio" id="radio_${name}" value="${name}">
+          <label for="radio_${name}">${name}</label>
+          <span class="album-count">${albums[name].length} photo${albums[name].length!==1?'s':''}</span>
+        </div>`).join('');
+    } else {
+      section.style.display = 'none';
+    }
+    document.getElementById('album-added-msg').style.display = 'none';
+  }
+
+  function buildPhotoEntry() {
+    return {
+      thumb: currentThumb,
+      score: currentResult.score,
+      verdict: currentResult.verdict,
+      summary: currentResult.summary,
+      strengths: currentResult.strengths,
+      issues: currentResult.issues,
+      keywords: currentResult.topKeywords,
+      categories: currentResult.bestCategories,
+      release: currentResult.releaseNeeded,
+      tip: currentResult.improvementTip,
+      date: new Date().toLocaleDateString('en-AU', { day:'numeric', month:'short', year:'numeric' })
+    };
+  }
+
+  function createAlbumAndAdd() {
+    const name = document.getElementById('newAlbumName').value.trim();
+    if (!name) { alert('Please enter an album name.'); return; }
+    if (!currentResult || !currentThumb) { alert('No analysis result to save.'); return; }
+    if (!albums[name]) albums[name] = [];
+    albums[name].push(buildPhotoEntry());
+    saveAlbums();
+    document.getElementById('newAlbumName').value = '';
+    document.getElementById('album-added-msg').textContent = `✓ Added to "${name}"`;
+    document.getElementById('album-added-msg').style.display = 'block';
+    refreshAlbumBox();
+  }
+
+  function addToSelectedAlbum() {
+    const sel = document.querySelector('input[name="albumRadio"]:checked');
+    if (!sel) { alert('Please select an album.'); return; }
+    if (!currentResult || !currentThumb) { alert('No analysis result to save.'); return; }
+    const name = sel.value;
+    albums[name].push(buildPhotoEntry());
+    saveAlbums();
+    document.getElementById('album-added-msg').textContent = `✓ Added to "${name}"`;
+    document.getElementById('album-added-msg').style.display = 'block';
+  }
+
+  // ── ALBUMS PANEL ──
+  function renderAlbumsPanel() {
+    const albumNames = Object.keys(albums);
+    const noMsg = document.getElementById('no-albums-msg');
+    const content = document.getElementById('albums-content');
+    if (albumNames.length === 0) {
+      noMsg.style.display = 'block'; content.style.display = 'none'; return;
+    }
+    noMsg.style.display = 'none'; content.style.display = 'block';
+    const sel = document.getElementById('albumSelect');
+    const current = sel.value && albums[sel.value] ? sel.value : albumNames[0];
+    sel.innerHTML = albumNames.map(n => `<option value="${n}" ${n===current?'selected':''}>${n} (${albums[n].length} photo${albums[n].length!==1?'s':''})</option>`).join('');
+    renderAlbumView();
+  }
+
+  function renderAlbumView() {
+    const name = document.getElementById('albumSelect').value;
+    const photos = albums[name] || [];
+    const view = document.getElementById('album-view');
+
+    view.innerHTML = `
+      <div class="album-header-row">
+        <h3>📁 ${name}</h3>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn-export" onclick="exportAlbumPDF('${name}')">⬇ Export PDF</button>
+          <button class="btn-del-album" onclick="deleteAlbum('${name}')">🗑 Delete</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#6a6a90;margin-bottom:14px">${photos.length} photo${photos.length!==1?'s':''}</div>
+      <div class="album-grid">
+        ${photos.map((p,i) => `
+          <div class="album-thumb-card" onclick="showPhotoDetail('${name}',${i})">
+            <img src="${p.thumb}" alt="photo ${i+1}" loading="lazy">
+            <div class="album-thumb-info">
+              <div class="album-thumb-score" style="color:${scoreColor(p.score)}">${p.score}/100</div>
+              <div class="album-thumb-verdict">${p.verdict}</div>
+              <div class="album-thumb-date">${p.date}</div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  function deleteAlbum(name) {
+    if (!confirm(`Delete album "${name}" and all its photos?`)) return;
+    delete albums[name];
+    saveAlbums();
+    renderAlbumsPanel();
+  }
+
+  function showPhotoDetail(albumName, idx) {
+    const p = albums[albumName][idx];
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:999;overflow-y:auto;padding:20px;display:flex;align-items:flex-start;justify-content:center;';
+    modal.innerHTML = `
+      <div style="background:#0e0e1c;border:1px solid #282848;border-radius:16px;max-width:500px;width:100%;padding:20px;margin:auto;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <span style="font-family:Syne,sans-serif;font-weight:800;font-size:15px;color:#fff">${albumName}</span>
+          <button onclick="this.closest('[style*=fixed]').remove()" style="background:none;border:none;color:#6a6a90;font-size:20px;cursor:pointer;">✕</button>
+        </div>
+        <img src="${p.thumb}" style="width:100%;border-radius:10px;margin-bottom:14px;object-fit:cover;max-height:250px;">
+        <div style="text-align:center;margin-bottom:14px;">
+          <div style="font-size:48px;font-weight:900;color:${scoreColor(p.score)}">${p.score}</div>
+          <div style="font-size:12px;color:#6a6a90">Stock Potential / 100</div>
+          <div style="margin-top:8px;font-size:14px;font-weight:700;color:${scoreColor(p.score)}">${p.verdict}</div>
+        </div>
+        <p style="font-size:13px;color:#9090b8;line-height:1.6;margin-bottom:12px">${p.summary}</p>
+        <div style="font-size:11px;color:#5b8fff;font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em">Keywords</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">${(p.keywords||[]).map((k,i)=>`<span style="padding:4px 10px;border-radius:20px;font-size:11px;background:${i<3?'#0d1a38':'#131325'};border:1px solid ${i<3?'#2a4a88':'#282848'};color:${i<3?'#7aaeff':'#9090b8'}">${k}</span>`).join('')}</div>
+        <div style="font-size:11px;color:#6a6a90;margin-bottom:4px">Release: <span style="color:${p.release==='None'?'#3dd68c':'#f5c842'}">${p.release}</span></div>
+        <div style="font-size:11px;color:#6a6a90;margin-bottom:12px">Added: ${p.date}</div>
+        <button onclick="removePhotoFromAlbum('${albumName}',${idx});this.closest('[style*=fixed]').remove();" style="width:100%;padding:10px;border-radius:8px;background:#1f0d0d;border:1px solid #6a2a2a;color:#f05a5a;font-size:12px;cursor:pointer;">Remove from Album</button>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  }
+
+  function removePhotoFromAlbum(name, idx) {
+    albums[name].splice(idx, 1);
+    if (albums[name].length === 0) delete albums[name];
+    saveAlbums();
+    renderAlbumsPanel();
+  }
+
+  // ── PDF EXPORT ──
+  async function exportAlbumPDF(albumName) {
+    const photos = albums[albumName];
+    if (!photos || photos.length === 0) { alert('No photos in this album.'); return; }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const PW = 210, PH = 297;
+    const MARGIN = 14;
+    const COL = (PW - MARGIN * 3) / 2; // two columns
+    const dark = [8,8,15], surface = [14,14,28], accent = [91,143,255];
+    const textMain = [228,228,240], textMuted = [106,106,144];
+
+    // ── COVER PAGE ──
+    doc.setFillColor(...dark);
+    doc.rect(0, 0, PW, PH, 'F');
+
+    // accent bar
+    doc.setFillColor(...accent);
+    doc.rect(0, 0, PW, 3, 'F');
+
+    // Title
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(28);
+    doc.setTextColor(...textMain);
+    doc.text(albumName, PW/2, 90, { align:'center' });
+
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(12);
+    doc.setTextColor(...textMuted);
+    doc.text('Adobe Stock Photo Analysis Report', PW/2, 102, { align:'center' });
+
+    doc.setFontSize(10);
+    doc.text(`${photos.length} photo${photos.length!==1?'s':''} · Generated ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}`, PW/2, 112, { align:'center' });
+
+    // stats summary
+    const avgScore = Math.round(photos.reduce((a,p) => a+p.score, 0) / photos.length);
+    const excellent = photos.filter(p=>p.verdict==='Excellent').length;
+    const good = photos.filter(p=>p.verdict==='Good').length;
+
+    doc.setFillColor(...surface);
+    doc.roundedRect(MARGIN, 130, PW-MARGIN*2, 50, 4, 4, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(24);
+    doc.setTextColor(...accent);
+    doc.text(String(avgScore), PW/2, 155, { align:'center' });
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.setTextColor(...textMuted);
+    doc.text('Average Score', PW/2, 162, { align:'center' });
+
+    const statX = [55, PW/2, PW-55];
+    const statV = [String(excellent), String(good), String(photos.length)];
+    const statL = ['Excellent', 'Good', 'Total Photos'];
+    statX.forEach((x,i) => {
+      doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(...textMain);
+      doc.text(statV[i], x, 175, {align:'center'});
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...textMuted);
+      doc.text(statL[i], x, 181, {align:'center'});
+    });
+
+    doc.setFillColor(...accent);
+    doc.rect(0, PH-3, PW, 3, 'F');
+
+    // ── PHOTO PAGES ──
+    for (let i = 0; i < photos.length; i++) {
+      const p = photos[i];
+      doc.addPage();
+
+      // dark bg
+      doc.setFillColor(...dark);
+      doc.rect(0, 0, PW, PH, 'F');
+      doc.setFillColor(...accent);
+      doc.rect(0, 0, PW, 2, 'F');
+
+      // Header
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...accent);
+      doc.text(albumName.toUpperCase(), MARGIN, 12);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...textMuted);
+      doc.text(`Photo ${i+1} of ${photos.length} · ${p.date}`, PW-MARGIN, 12, {align:'right'});
+
+      let y = 20;
+
+      // Thumbnail
+      try {
+        const imgH = 70;
+        doc.addImage(p.thumb, 'JPEG', MARGIN, y, PW - MARGIN*2, imgH, undefined, 'MEDIUM');
+        y += imgH + 6;
+      } catch(e) { y += 6; }
+
+      // Score row
+      const sColor = p.score >= 75 ? [61,214,140] : p.score >= 50 ? [245,200,66] : [240,90,90];
+      doc.setFillColor(...surface);
+      doc.roundedRect(MARGIN, y, PW-MARGIN*2, 18, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(18); doc.setTextColor(...sColor);
+      doc.text(String(p.score), MARGIN+8, y+12);
+      doc.setFontSize(8); doc.setTextColor(...textMuted);
+      doc.text('/ 100  Stock Potential', MARGIN+20, y+12);
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...sColor);
+      doc.text(p.verdict, PW-MARGIN-4, y+12, {align:'right'});
+      y += 24;
+
+      // Summary
+      doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(...textMain);
+      const summaryLines = doc.splitTextToSize(p.summary, PW-MARGIN*2);
+      doc.text(summaryLines, MARGIN, y);
+      y += summaryLines.length * 5 + 6;
+
+      // Two column layout: Strengths | Issues
+      const colW = (PW - MARGIN*3) / 2;
+
+      // Strengths
+      doc.setFillColor(13,42,26);
+      doc.roundedRect(MARGIN, y, colW, 32, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(61,214,140);
+      doc.text('STRENGTHS', MARGIN+4, y+6);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...textMuted);
+      (p.strengths||[]).slice(0,3).forEach((s,si) => {
+        const lines = doc.splitTextToSize('• ' + s, colW-8);
+        doc.text(lines, MARGIN+4, y+11+(si*7));
+      });
+
+      // Issues
+      const issX = MARGIN + colW + MARGIN;
+      doc.setFillColor(42,13,13);
+      doc.roundedRect(issX, y, colW, 32, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(240,90,90);
+      doc.text('ISSUES', issX+4, y+6);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...textMuted);
+      const issuesList = (p.issues||[]).filter(x=>x&&x!=='None');
+      if (issuesList.length === 0) {
+        doc.setTextColor(61,214,140); doc.text('None detected', issX+4, y+13);
+      } else {
+        issuesList.slice(0,2).forEach((s,si) => {
+          const lines = doc.splitTextToSize('• ' + s, colW-8);
+          doc.text(lines, issX+4, y+11+(si*7));
+        });
+      }
+      y += 38;
+
+      // Keywords
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
+      doc.text('KEYWORDS', MARGIN, y+4);
+      y += 8;
+      let kx = MARGIN;
+      (p.keywords||[]).forEach((kw,ki) => {
+        const kw_text = kw + (ki < 3 ? ' *' : '');
+        const tw = doc.getTextWidth(kw_text) + 6;
+        if (kx + tw > PW - MARGIN) { kx = MARGIN; y += 8; }
+        doc.setFillColor(ki<3?[13,26,56]:[19,19,37]);
+        doc.setFillColor(...(ki<3?[13,26,56]:[19,19,37]));
+        doc.roundedRect(kx, y-4, tw, 7, 2, 2, 'F');
+        doc.setFont('helvetica', ki<3?'bold':'normal');
+        doc.setFontSize(7);
+        doc.setTextColor(...(ki<3?[122,174,255]:[144,144,184]));
+        doc.text(kw_text, kx+3, y+1);
+        kx += tw + 3;
+      });
+      y += 12;
+
+      // Release & Categories
+      doc.setFillColor(...surface);
+      doc.roundedRect(MARGIN, y, colW, 14, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...textMuted);
+      doc.text('RELEASE NEEDED', MARGIN+4, y+5);
+      const rColor = p.release==='None'?[61,214,140]:[245,200,66];
+      doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(...rColor);
+      doc.text(p.release, MARGIN+4, y+11);
+
+      doc.setFillColor(...surface);
+      doc.roundedRect(issX, y, colW, 14, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...textMuted);
+      doc.text('BEST CATEGORIES', issX+4, y+5);
+      doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...textMain);
+      (p.categories||[]).forEach((c,ci) => doc.text('• ' + c, issX+4, y+10+(ci*5)));
+      y += 20;
+
+      // Improvement tip
+      doc.setFillColor(10,21,48);
+      doc.roundedRect(MARGIN, y, PW-MARGIN*2, 20, 3, 3, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(7); doc.setTextColor(...accent);
+      doc.text('IMPROVEMENT TIP', MARGIN+4, y+6);
+      doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(...textMuted);
+      const tipLines = doc.splitTextToSize(p.tip, PW-MARGIN*2-8);
+      doc.text(tipLines, MARGIN+4, y+12);
+
+      // footer
+      doc.setFillColor(...accent);
+      doc.rect(0, PH-2, PW, 2, 'F');
+      doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...textMuted);
+      doc.text('Rate My Photo · Adobe Stock Analyzer', PW/2, PH-5, {align:'center'});
+    }
+
+    doc.save(`${albumName.replace(/\s+/g,'-')}-stock-analysis.pdf`);
   }
 
   function resetAnalyzer() {
     imageBase64 = null;
+    currentThumb = null;
+    currentResult = null;
     document.getElementById('preview').style.display = 'none';
     document.getElementById('dz-icon').style.display = 'block';
     document.getElementById('dz-text').style.display = 'block';
     document.getElementById('dz-sub').style.display = 'block';
     document.getElementById('analyzeBtn').disabled = true;
     document.getElementById('results').style.display = 'none';
+    document.getElementById('album-added-msg').style.display = 'none';
     hideError();
     document.getElementById('fileInput').value = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
