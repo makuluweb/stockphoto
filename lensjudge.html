@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -23,216 +22,214 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:var(--bg);color:var(--text);font-family:'Space Mono',monospace;min-height:100vh;}
 
-/* KEY GATE */
-#key-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
-background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(232,255,71,.07) 0%,transparent 70%),var(–bg);}
-#key-gate .box{width:100%;max-width:460px;background:var(–surface);border:1px solid var(–border2);border-radius:20px;padding:40px;}
-#key-gate .logo{font-family:‘Syne’,sans-serif;font-size:34px;font-weight:800;
-background:linear-gradient(135deg,var(–accent) 0%,#fff 65%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
-#key-gate .tagline{font-size:10px;color:var(–textdim);letter-spacing:.18em;margin-bottom:28px;}
-#key-gate label{display:block;font-size:10px;color:var(–textdim);letter-spacing:.15em;text-transform:uppercase;margin-bottom:7px;}
-#key-gate input[type=password]{width:100%;background:rgba(255,255,255,.05);border:1px solid var(–border2);
-border-radius:10px;padding:13px 16px;color:var(–text);font-family:‘Space Mono’,monospace;font-size:13px;
-outline:none;margin-bottom:10px;transition:border-color .2s;}
-#key-gate input[type=password]:focus{border-color:var(–accent);}
-#key-gate .hint{font-size:11px;color:var(–textdim);font-family:‘Lora’,serif;line-height:1.65;margin-bottom:20px;}
-#key-gate .hint a{color:var(–accent);text-decoration:none;}
-#key-err{color:#ff4f4f;font-size:11px;margin-top:8px;display:none;}
+  /* KEY GATE */
+  #key-gate{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(232,255,71,.07) 0%,transparent 70%),var(--bg);}
+  #key-gate .box{width:100%;max-width:460px;background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:40px;}
+  #key-gate .logo{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;
+    background:linear-gradient(135deg,var(--accent) 0%,#fff 65%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px;}
+  #key-gate .tagline{font-size:10px;color:var(--textdim);letter-spacing:.18em;margin-bottom:28px;}
+  #key-gate label{display:block;font-size:10px;color:var(--textdim);letter-spacing:.15em;text-transform:uppercase;margin-bottom:7px;}
+  #key-gate input[type=password]{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border2);
+    border-radius:10px;padding:13px 16px;color:var(--text);font-family:'Space Mono',monospace;font-size:13px;
+    outline:none;margin-bottom:10px;transition:border-color .2s;}
+  #key-gate input[type=password]:focus{border-color:var(--accent);}
+  #key-gate .hint{font-size:11px;color:var(--textdim);font-family:'Lora',serif;line-height:1.65;margin-bottom:20px;}
+  #key-gate .hint a{color:var(--accent);text-decoration:none;}
+  #key-err{color:#ff4f4f;font-size:11px;margin-top:8px;display:none;}
 
-/* APP */
-#app{display:none;}
-header{background:var(–surface);border-bottom:1px solid var(–border);padding:24px 32px 0;position:sticky;top:0;z-index:100;}
-.hinner{max-width:900px;margin:0 auto;}
-.htop{display:flex;align-items:flex-end;gap:18px;margin-bottom:20px;}
-.eyebrow{font-size:10px;color:var(–muted);letter-spacing:.2em;margin-bottom:4px;}
-.logo{font-family:‘Syne’,sans-serif;font-size:36px;font-weight:800;
-background:linear-gradient(135deg,var(–accent) 0%,#fff 60%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
-.hdesc{font-family:‘Lora’,serif;font-size:13px;color:var(–textdim);line-height:1.55;max-width:300px;padding-bottom:3px;}
-.key-ind{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:10px;color:var(–textdim);
-cursor:pointer;padding:5px 12px;border:1px solid var(–border);border-radius:20px;transition:all .2s;
-white-space:nowrap;align-self:flex-start;margin-top:3px;}
-.key-ind:hover{border-color:var(–border2);color:var(–text);}
-.kdot{width:6px;height:6px;border-radius:50%;background:var(–green);display:inline-block;}
+  /* APP */
+  #app{display:none;}
+  header{background:var(--surface);border-bottom:1px solid var(--border);padding:24px 32px 0;position:sticky;top:0;z-index:100;}
+  .hinner{max-width:900px;margin:0 auto;}
+  .htop{display:flex;align-items:flex-end;gap:18px;margin-bottom:20px;}
+  .eyebrow{font-size:10px;color:var(--muted);letter-spacing:.2em;margin-bottom:4px;}
+  .logo{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;
+    background:linear-gradient(135deg,var(--accent) 0%,#fff 60%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+  .hdesc{font-family:'Lora',serif;font-size:13px;color:var(--textdim);line-height:1.55;max-width:300px;padding-bottom:3px;}
+  .key-ind{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:10px;color:var(--textdim);
+    cursor:pointer;padding:5px 12px;border:1px solid var(--border);border-radius:20px;transition:all .2s;
+    white-space:nowrap;align-self:flex-start;margin-top:3px;}
+  .key-ind:hover{border-color:var(--border2);color:var(--text);}
+  .kdot{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block;}
 
-/* TABS */
-.tabs{display:flex;}
-.tab-btn{background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;
-padding:10px 20px 12px;color:var(–muted);font-family:‘Space Mono’,monospace;font-size:11px;
-letter-spacing:.05em;transition:all .15s;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
-.tab-btn.active{color:var(–accent);border-bottom-color:var(–accent);}
-.tab-btn:hover:not(.active){color:var(–text);}
-.tsub{font-size:9px;opacity:.5;letter-spacing:.12em;}
+  /* TABS */
+  .tabs{display:flex;}
+  .tab-btn{background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;
+    padding:10px 20px 12px;color:var(--muted);font-family:'Space Mono',monospace;font-size:11px;
+    letter-spacing:.05em;transition:all .15s;display:flex;flex-direction:column;align-items:flex-start;gap:2px;}
+  .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .tab-btn:hover:not(.active){color:var(--text);}
+  .tsub{font-size:9px;opacity:.5;letter-spacing:.12em;}
 
-main{max-width:900px;margin:0 auto;padding:26px 32px 80px;}
-.tab-panel{display:none;}.tab-panel.active{display:block;}
+  main{max-width:900px;margin:0 auto;padding:26px 32px 80px;}
+  .tab-panel{display:none;}.tab-panel.active{display:block;}
 
-/* CARDS */
-.card{background:var(–surface);border:1px solid var(–border);border-radius:16px;padding:20px 22px;margin-bottom:14px;}
-.card-accent{background:rgba(232,255,71,.04);border-color:rgba(232,255,71,.18);}
-.card-green{background:rgba(61,255,160,.04);border-color:rgba(61,255,160,.15);}
-.slabel{font-size:10px;color:var(–muted);letter-spacing:.18em;text-transform:uppercase;margin-bottom:13px;}
+  /* CARDS */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;margin-bottom:14px;}
+  .card-accent{background:rgba(232,255,71,.04);border-color:rgba(232,255,71,.18);}
+  .card-green{background:rgba(61,255,160,.04);border-color:rgba(61,255,160,.15);}
+  .slabel{font-size:10px;color:var(--muted);letter-spacing:.18em;text-transform:uppercase;margin-bottom:13px;}
 
-/* INPUTS — fixed legibility */
-.irow{display:flex;gap:10px;}
-input[type=text],input[type=search],input[type=password],textarea,select{
-background:rgba(255,255,255,.07);
-border:1px solid var(–border2);
-border-radius:10px;
-padding:12px 16px;
-color:#e8eaf0;
-font-family:‘Lora’,serif;
-font-size:14px;
-outline:none;
-transition:border-color .2s;
-width:100%;
-}
-input::placeholder,textarea::placeholder{color:var(–muted);}
-input:focus,textarea:focus,select:focus{border-color:var(–accent);}
-select{background:#141620;cursor:pointer;color:#e8eaf0;}
-select option{background:#141620;color:#e8eaf0;}
+  /* INPUTS — fixed legibility */
+  .irow{display:flex;gap:10px;}
+  input[type=text],input[type=search],input[type=password],textarea,select{
+    background:rgba(255,255,255,.07);
+    border:1px solid var(--border2);
+    border-radius:10px;
+    padding:12px 16px;
+    color:#e8eaf0;
+    font-family:'Lora',serif;
+    font-size:14px;
+    outline:none;
+    transition:border-color .2s;
+    width:100%;
+  }
+  input::placeholder,textarea::placeholder{color:var(--muted);}
+  input:focus,textarea:focus,select:focus{border-color:var(--accent);}
+  select{background:#141620;cursor:pointer;color:#e8eaf0;}
+  select option{background:#141620;color:#e8eaf0;}
 
-.btn{background:var(–accent);color:#07080f;border:none;border-radius:10px;
-padding:0 22px;font-family:‘Space Mono’,monospace;font-size:12px;font-weight:700;
-cursor:pointer;white-space:nowrap;transition:opacity .15s;height:48px;}
-.btn:disabled{opacity:.35;cursor:not-allowed;}
-.btn:hover:not(:disabled){opacity:.85;}
-.btn-sm{height:36px;padding:0 14px;font-size:11px;}
-.btn-outline{background:transparent;border:1px solid var(–border2);color:var(–text);
-border-radius:10px;padding:0 16px;height:36px;font-family:‘Space Mono’,monospace;
-font-size:11px;cursor:pointer;transition:all .15s;}
-.btn-outline:hover{border-color:var(–accent);color:var(–accent);}
+  .btn{background:var(--accent);color:#07080f;border:none;border-radius:10px;
+    padding:0 22px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;
+    cursor:pointer;white-space:nowrap;transition:opacity .15s;height:48px;}
+  .btn:disabled{opacity:.35;cursor:not-allowed;}
+  .btn:hover:not(:disabled){opacity:.85;}
+  .btn-sm{height:36px;padding:0 14px;font-size:11px;}
+  .btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text);
+    border-radius:10px;padding:0 16px;height:36px;font-family:'Space Mono',monospace;
+    font-size:11px;cursor:pointer;transition:all .15s;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
 
-/* GRID */
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
+  /* GRID */
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+  .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;}
 
-/* NUMBERS */
-.bignum{font-family:‘Syne’,sans-serif;font-size:48px;font-weight:800;line-height:1;margin-bottom:10px;}
-.bignum-sm{font-family:‘Syne’,sans-serif;font-size:34px;font-weight:800;line-height:1;margin-bottom:6px;}
+  /* NUMBERS */
+  .bignum{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;line-height:1;margin-bottom:10px;}
+  .bignum-sm{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;line-height:1;margin-bottom:6px;}
 
-/* BAR */
-.bw{background:rgba(255,255,255,.07);border-radius:3px;height:5px;overflow:hidden;flex:1;}
-.bf{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1);}
+  /* BAR */
+  .bw{background:rgba(255,255,255,.07);border-radius:3px;height:5px;overflow:hidden;flex:1;}
+  .bf{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1);}
 
-/* PILL */
-.pill{display:inline-block;padding:3px 11px;border-radius:40px;font-size:10px;
-font-family:‘Space Mono’,monospace;letter-spacing:.04em;white-space:nowrap;border:1px solid;}
+  /* PILL */
+  .pill{display:inline-block;padding:3px 11px;border-radius:40px;font-size:10px;
+    font-family:'Space Mono',monospace;letter-spacing:.04em;white-space:nowrap;border:1px solid;}
 
-/* KW TAG */
-.kwtag{display:inline-block;background:rgba(255,255,255,.06);border:1px solid var(–border);
-color:var(–textdim);padding:4px 11px;border-radius:20px;font-size:10px;
-font-family:‘Space Mono’,monospace;margin:3px;}
+  /* KW TAG */
+  .kwtag{display:inline-block;background:rgba(255,255,255,.06);border:1px solid var(--border);
+    color:var(--textdim);padding:4px 11px;border-radius:20px;font-size:10px;
+    font-family:'Space Mono',monospace;margin:3px;}
 
-/* BORDER ITEMS */
-.bi{padding-left:14px;margin-bottom:12px;}
-.bi .bt{font-size:12px;font-family:‘Space Mono’,monospace;margin-bottom:4px;}
-.bi .bb{font-family:‘Lora’,serif;font-size:12px;color:var(–textdim);line-height:1.6;}
+  /* BORDER ITEMS */
+  .bi{padding-left:14px;margin-bottom:12px;}
+  .bi .bt{font-size:12px;font-family:'Space Mono',monospace;margin-bottom:4px;}
+  .bi .bb{font-family:'Lora',serif;font-size:12px;color:var(--textdim);line-height:1.6;}
 
-/* SPINNER */
-.sw{text-align:center;padding:50px 0;}
-.sp{width:32px;height:32px;border:2px solid var(–border);border-top-color:var(–accent);
-border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.sl{font-size:11px;color:var(–muted);}
+  /* SPINNER */
+  .sw{text-align:center;padding:50px 0;}
+  .sp{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);
+    border-radius:50%;margin:0 auto 14px;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .sl{font-size:11px;color:var(--muted);}
 
-/* EMPTY */
-.empty{text-align:center;padding:60px 20px;color:var(–textdim);}
-.empty .ei{font-size:32px;opacity:.25;margin-bottom:12px;}
-.empty p{font-family:‘Lora’,serif;font-size:14px;line-height:1.7;}
+  /* EMPTY */
+  .empty{text-align:center;padding:60px 20px;color:var(--textdim);}
+  .empty .ei{font-size:32px;opacity:.25;margin-bottom:12px;}
+  .empty p{font-family:'Lora',serif;font-size:14px;line-height:1.7;}
 
-/* PROSE */
-.prose{font-family:‘Lora’,serif;font-size:14px;line-height:1.8;color:var(–text);}
-.prose-sm{font-family:‘Lora’,serif;font-size:12px;line-height:1.6;color:var(–textdim);}
+  /* PROSE */
+  .prose{font-family:'Lora',serif;font-size:14px;line-height:1.8;color:var(--text);}
+  .prose-sm{font-family:'Lora',serif;font-size:12px;line-height:1.6;color:var(--textdim);}
 
-/* METRIC ROW */
-.mrow{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);
-border-radius:10px;padding:10px 14px;margin-bottom:8px;}
-.mrow .ml{font-size:12px;flex:1;}
-.mrow .mn{font-family:‘Lora’,serif;font-size:11px;color:var(–textdim);flex:1;}
+  /* METRIC ROW */
+  .mrow{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);
+    border-radius:10px;padding:10px 14px;margin-bottom:8px;}
+  .mrow .ml{font-size:12px;flex:1;}
+  .mrow .mn{font-family:'Lora',serif;font-size:11px;color:var(--textdim);flex:1;}
 
-/* DROP ZONE */
-.dz{border:2px dashed var(–border2);border-radius:12px;padding:28px 20px;
-text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px;}
-.dz:hover,.dz.over{border-color:var(–accent);background:rgba(232,255,71,.03);}
-.dz .di{font-size:24px;margin-bottom:8px;opacity:.4;}
-.dz .dl{font-size:11px;color:var(–muted);}
-.dz img{max-height:180px;object-fit:contain;border-radius:8px;}
+  /* DROP ZONE */
+  .dz{border:2px dashed var(--border2);border-radius:12px;padding:28px 20px;
+    text-align:center;cursor:pointer;transition:all .2s;margin-bottom:10px;}
+  .dz:hover,.dz.over{border-color:var(--accent);background:rgba(232,255,71,.03);}
+  .dz .di{font-size:24px;margin-bottom:8px;opacity:.4;}
+  .dz .dl{font-size:11px;color:var(--muted);}
+  .dz img{max-height:180px;object-fit:contain;border-radius:8px;}
 
-/* BRIEF CARD */
-.brief-card{background:var(–surface);border:1px solid var(–border);border-radius:14px;
-padding:18px 20px;margin-bottom:12px;animation:fadeUp .35s ease both;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.brief-card.saved{border-color:rgba(232,255,71,.35);}
-.bh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:12px;}
-.btitle{font-family:‘Syne’,sans-serif;font-size:17px;font-weight:700;line-height:1.3;}
-.save-btn{background:transparent;border:1px solid var(–border);color:var(–muted);
-border-radius:8px;padding:5px 13px;font-family:‘Space Mono’,monospace;font-size:10px;
-cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
-.save-btn.saved{background:var(–accent);color:#07080f;border-color:var(–accent);}
+  /* BRIEF CARD */
+  .brief-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;
+    padding:18px 20px;margin-bottom:12px;animation:fadeUp .35s ease both;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .brief-card.saved{border-color:rgba(232,255,71,.35);}
+  .bh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:12px;}
+  .btitle{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;line-height:1.3;}
+  .save-btn{background:transparent;border:1px solid var(--border);color:var(--muted);
+    border-radius:8px;padding:5px 13px;font-family:'Space Mono',monospace;font-size:10px;
+    cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+  .save-btn.saved{background:var(--accent);color:#07080f;border-color:var(--accent);}
 
-/* ALBUMS PANEL */
-#albums-panel{position:fixed;top:0;right:0;width:340px;height:100vh;background:#0a0c16;
-border-left:1px solid var(–border2);z-index:200;display:none;flex-direction:column;
-padding:0;overflow:hidden;}
-#albums-panel.open{display:flex;}
-.ap-header{padding:20px 22px 16px;border-bottom:1px solid var(–border);display:flex;align-items:center;justify-content:space-between;}
-.ap-title{font-family:‘Syne’,sans-serif;font-size:18px;font-weight:700;}
-.ap-close{background:none;border:none;color:var(–muted);font-size:18px;cursor:pointer;padding:4px;}
-.ap-close:hover{color:var(–text);}
-.ap-body{flex:1;overflow-y:auto;padding:16px 22px;}
-.ap-footer{padding:16px 22px;border-top:1px solid var(–border);}
-.album-item{background:rgba(255,255,255,.04);border:1px solid var(–border);border-radius:12px;
-padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .15s;}
-.album-item:hover{border-color:var(–border2);}
-.album-item.selected{border-color:var(–accent);background:rgba(232,255,71,.05);}
-.album-name{font-size:13px;font-weight:700;margin-bottom:3px;}
-.album-count{font-size:10px;color:var(–muted);}
-.album-thumbs{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
-.album-thumb{width:40px;height:40px;border-radius:6px;object-fit:cover;border:1px solid var(–border);}
-.album-thumb-ph{width:40px;height:40px;border-radius:6px;background:rgba(255,255,255,.06);
-border:1px solid var(–border);display:flex;align-items:center;justify-content:center;
-font-size:16px;color:var(–muted);}
+  /* ALBUMS PANEL */
+  #albums-panel{position:fixed;top:0;right:0;width:340px;height:100vh;background:#0a0c16;
+    border-left:1px solid var(--border2);z-index:200;display:none;flex-direction:column;
+    padding:0;overflow:hidden;}
+  #albums-panel.open{display:flex;}
+  .ap-header{padding:20px 22px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .ap-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:700;}
+  .ap-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:4px;}
+  .ap-close:hover{color:var(--text);}
+  .ap-body{flex:1;overflow-y:auto;padding:16px 22px;}
+  .ap-footer{padding:16px 22px;border-top:1px solid var(--border);}
+  .album-item{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;
+    padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:all .15s;}
+  .album-item:hover{border-color:var(--border2);}
+  .album-item.selected{border-color:var(--accent);background:rgba(232,255,71,.05);}
+  .album-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+  .album-count{font-size:10px;color:var(--muted);}
+  .album-thumbs{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;}
+  .album-thumb{width:40px;height:40px;border-radius:6px;object-fit:cover;border:1px solid var(--border);}
+  .album-thumb-ph{width:40px;height:40px;border-radius:6px;background:rgba(255,255,255,.06);
+    border:1px solid var(--border);display:flex;align-items:center;justify-content:center;
+    font-size:16px;color:var(--muted);}
 
-/* SAVE TO ALBUM MODAL */
-#album-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;
-display:none;align-items:center;justify-content:center;}
-#album-modal.open{display:flex;}
-.am-box{background:var(–surface);border:1px solid var(–border2);border-radius:20px;
-padding:32px;width:100%;max-width:420px;margin:20px;}
-.am-title{font-family:‘Syne’,sans-serif;font-size:20px;font-weight:700;margin-bottom:18px;}
-.am-albums{max-height:220px;overflow-y:auto;margin-bottom:14px;}
-.am-album-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-cursor:pointer;transition:background .15s;border:1px solid transparent;}
-.am-album-row:hover{background:rgba(255,255,255,.05);}
-.am-album-row.selected{border-color:var(–accent);background:rgba(232,255,71,.06);}
-.am-check{width:18px;height:18px;border-radius:4px;border:1px solid var(–border2);
-display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
-.am-check.on{background:var(–accent);border-color:var(–accent);color:#07080f;}
-.am-sep{font-size:10px;color:var(–muted);letter-spacing:.15em;margin:14px 0 10px;}
-.am-new-row{display:flex;gap:8px;}
-.am-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+  /* SAVE TO ALBUM MODAL */
+  #album-modal{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;
+    display:none;align-items:center;justify-content:center;}
+  #album-modal.open{display:flex;}
+  .am-box{background:var(--surface);border:1px solid var(--border2);border-radius:20px;
+    padding:32px;width:100%;max-width:420px;margin:20px;}
+  .am-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:18px;}
+  .am-albums{max-height:220px;overflow-y:auto;margin-bottom:14px;}
+  .am-album-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+    cursor:pointer;transition:background .15s;border:1px solid transparent;}
+  .am-album-row:hover{background:rgba(255,255,255,.05);}
+  .am-album-row.selected{border-color:var(--accent);background:rgba(232,255,71,.06);}
+  .am-check{width:18px;height:18px;border-radius:4px;border:1px solid var(--border2);
+    display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+  .am-check.on{background:var(--accent);border-color:var(--accent);color:#07080f;}
+  .am-sep{font-size:10px;color:var(--muted);letter-spacing:.15em;margin:14px 0 10px;}
+  .am-new-row{display:flex;gap:8px;}
+  .am-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
 
-/* ALBUMS BTN in header */
-.albums-trigger{margin-left:8px;display:flex;align-items:center;gap:7px;font-size:10px;
-color:var(–textdim);cursor:pointer;padding:5px 12px;border:1px solid var(–border);
-border-radius:20px;transition:all .2s;white-space:nowrap;align-self:flex-start;margin-top:3px;}
-.albums-trigger:hover{border-color:var(–border2);color:var(–text);}
+  /* ALBUMS BTN in header */
+  .albums-trigger{margin-left:8px;display:flex;align-items:center;gap:7px;font-size:10px;
+    color:var(--textdim);cursor:pointer;padding:5px 12px;border:1px solid var(--border);
+    border-radius:20px;transition:all .2s;white-space:nowrap;align-self:flex-start;margin-top:3px;}
+  .albums-trigger:hover{border-color:var(--border2);color:var(--text);}
 
-@media(max-width:600px){
-header,main{padding-left:16px;padding-right:16px;}
-.g2,.g3{grid-template-columns:1fr;}
-.tabs{overflow-x:auto;}
-.tab-btn{padding:10px 14px 12px;font-size:10px;}
-.bignum{font-size:38px;}
-#albums-panel{width:100%;}
-}
+  @media(max-width:600px){
+    header,main{padding-left:16px;padding-right:16px;}
+    .g2,.g3{grid-template-columns:1fr;}
+    .tabs{overflow-x:auto;}
+    .tab-btn{padding:10px 14px 12px;font-size:10px;}
+    .bignum{font-size:38px;}
+    #albums-panel{width:100%;}
+  }
 </style>
-
 </head>
 <body>
 
 <!-- KEY GATE -->
-
 <div id="key-gate">
   <div class="box">
     <div class="logo">LENS JUDGE</div>
@@ -245,12 +242,11 @@ header,main{padding-left:16px;padding-right:16px;}
       Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
     </div>
     <button class="btn" style="width:100%;font-size:13px;" onclick="submitKey()">Enter →</button>
-    <div id="key-err">Please enter a valid API key (starts with sk-ant-)</div>
+    <div id="key-err">Please enter your Anthropic API key</div>
   </div>
 </div>
 
 <!-- MAIN APP -->
-
 <div id="app">
   <header>
     <div class="hinner">
@@ -287,73 +283,69 @@ header,main{padding-left:16px;padding-right:16px;}
       <div class="empty" id="demand-empty"><div class="ei">◎</div><p>Enter a niche to see trending keywords,<br>rising categories and seasonal shifts.</p></div>
     </div>
 
-```
-<!-- SATURATION -->
-<div id="tab-saturation" class="tab-panel">
-  <div class="card">
-    <div class="slabel">Analyse a topic or subject</div>
-    <div class="irow">
-      <input type="text" id="sat-input" placeholder='e.g. "coffee cups", "diverse business teams", "solar energy"…' onkeydown="if(event.key==='Enter')runSaturation()">
-      <button class="btn" onclick="runSaturation()">Analyse →</button>
+    <!-- SATURATION -->
+    <div id="tab-saturation" class="tab-panel">
+      <div class="card">
+        <div class="slabel">Analyse a topic or subject</div>
+        <div class="irow">
+          <input type="text" id="sat-input" placeholder='e.g. "coffee cups", "diverse business teams", "solar energy"…' onkeydown="if(event.key==='Enter')runSaturation()">
+          <button class="btn" onclick="runSaturation()">Analyse →</button>
+        </div>
+      </div>
+      <div id="sat-spin" class="sw" style="display:none"><div class="sp"></div><div class="sl">Mapping the supply gap…</div></div>
+      <div id="sat-res" style="display:none"></div>
+      <div class="empty" id="sat-empty"><div class="ei">⊘</div><p>Enter a topic to see oversupplied angles to avoid<br>and undersupplied gaps to exploit.</p></div>
     </div>
-  </div>
-  <div id="sat-spin" class="sw" style="display:none"><div class="sp"></div><div class="sl">Mapping the supply gap…</div></div>
-  <div id="sat-res" style="display:none"></div>
-  <div class="empty" id="sat-empty"><div class="ei">⊘</div><p>Enter a topic to see oversupplied angles to avoid<br>and undersupplied gaps to exploit.</p></div>
-</div>
 
-<!-- SHOOTS -->
-<div id="tab-shoots" class="tab-panel">
-  <div class="card">
-    <div class="slabel">Your context (optional but recommended)</div>
-    <input type="text" id="sh-context" placeholder='Your specialty e.g. "portrait photographer", "drone / aerial", "macro"…' style="margin-bottom:10px;">
-    <div class="g2" style="margin-bottom:10px;">
-      <input type="text" id="sh-location" placeholder='Your location e.g. "Western Australia", "Tokyo"…'>
-      <select id="sh-style">
-        <option value="any">Any style</option>
-        <option value="lifestyle">Lifestyle / People</option>
-        <option value="landscape">Landscape / Nature</option>
-        <option value="macro">Macro / Abstract</option>
-        <option value="aerial">Aerial / Drone</option>
-        <option value="architecture">Architecture / Urban</option>
-        <option value="product">Product / Food</option>
-      </select>
+    <!-- SHOOTS -->
+    <div id="tab-shoots" class="tab-panel">
+      <div class="card">
+        <div class="slabel">Your context (optional but recommended)</div>
+        <input type="text" id="sh-context" placeholder='Your specialty e.g. "portrait photographer", "drone / aerial", "macro"…' style="margin-bottom:10px;">
+        <div class="g2" style="margin-bottom:10px;">
+          <input type="text" id="sh-location" placeholder='Your location e.g. "Western Australia", "Tokyo"…'>
+          <select id="sh-style">
+            <option value="any">Any style</option>
+            <option value="lifestyle">Lifestyle / People</option>
+            <option value="landscape">Landscape / Nature</option>
+            <option value="macro">Macro / Abstract</option>
+            <option value="aerial">Aerial / Drone</option>
+            <option value="architecture">Architecture / Urban</option>
+            <option value="product">Product / Food</option>
+          </select>
+        </div>
+        <button class="btn" style="width:100%;font-size:13px;" onclick="runShoots()">Generate Shoot Briefs →</button>
+      </div>
+      <div id="sh-spin" class="sw" style="display:none"><div class="sp"></div><div class="sl">Generating briefs…</div></div>
+      <div id="saved-banner" style="display:none" class="card card-accent"><div class="slabel">Saved briefs</div><div id="saved-pills"></div></div>
+      <div id="sh-res" style="display:none"></div>
+      <div class="empty" id="sh-empty"><div class="ei">⊕</div><p>Generate hyper-specific, commercially-driven shoot briefs<br>tailored to your style and location.</p></div>
     </div>
-    <button class="btn" style="width:100%;font-size:13px;" onclick="runShoots()">Generate Shoot Briefs →</button>
-  </div>
-  <div id="sh-spin" class="sw" style="display:none"><div class="sp"></div><div class="sl">Generating briefs…</div></div>
-  <div id="saved-banner" style="display:none" class="card card-accent"><div class="slabel">Saved briefs</div><div id="saved-pills"></div></div>
-  <div id="sh-res" style="display:none"></div>
-  <div class="empty" id="sh-empty"><div class="ei">⊕</div><p>Generate hyper-specific, commercially-driven shoot briefs<br>tailored to your style and location.</p></div>
-</div>
 
-<!-- PREDICT -->
-<div id="tab-predict" class="tab-panel">
-  <div class="card">
-    <div class="slabel">Upload a photo or describe your concept</div>
-    <div class="dz" id="dz" onclick="document.getElementById('pf').click()"
-      ondragover="event.preventDefault();this.classList.add('over')"
-      ondragleave="this.classList.remove('over')"
-      ondrop="handleDrop(event)">
-      <div id="dzi"><div class="di">⬆</div><div class="dl">Drop image here or click to upload</div></div>
-      <input type="file" id="pf" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+    <!-- PREDICT -->
+    <div id="tab-predict" class="tab-panel">
+      <div class="card">
+        <div class="slabel">Upload a photo or describe your concept</div>
+        <div class="dz" id="dz" onclick="document.getElementById('pf').click()"
+          ondragover="event.preventDefault();this.classList.add('over')"
+          ondragleave="this.classList.remove('over')"
+          ondrop="handleDrop(event)">
+          <div id="dzi"><div class="di">⬆</div><div class="dl">Drop image here or click to upload</div></div>
+          <input type="file" id="pf" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+        </div>
+        <div class="irow">
+          <input type="text" id="pred-desc" placeholder="Or describe a concept / photo you're planning to shoot…">
+          <button class="btn" onclick="runPredict()">Predict →</button>
+        </div>
+      </div>
+      <div id="pred-spin" class="sw" style="display:none"><div class="sp"></div><div class="sl">Running revenue analysis…</div></div>
+      <div id="pred-res" style="display:none"></div>
+      <div class="empty" id="pred-empty"><div class="ei">◈</div><p>Upload a photo or describe a concept to get approval probability,<br>revenue estimates, saturation risk, and agency recommendations.</p></div>
     </div>
-    <div class="irow">
-      <input type="text" id="pred-desc" placeholder="Or describe a concept / photo you're planning to shoot…">
-      <button class="btn" onclick="runPredict()">Predict →</button>
-    </div>
-  </div>
-  <div id="pred-spin" class="sw" style="display:none"><div class="sp"></div><div class="sl">Running revenue analysis…</div></div>
-  <div id="pred-res" style="display:none"></div>
-  <div class="empty" id="pred-empty"><div class="ei">◈</div><p>Upload a photo or describe a concept to get approval probability,<br>revenue estimates, saturation risk, and agency recommendations.</p></div>
-</div>
-```
-
   </main>
 </div>
 
 <!-- ALBUMS PANEL -->
-
 <div id="albums-panel">
   <div class="ap-header">
     <div class="ap-title">◫ Albums</div>
@@ -374,7 +366,6 @@ header,main{padding-left:16px;padding-right:16px;}
 </div>
 
 <!-- SAVE TO ALBUM MODAL -->
-
 <div id="album-modal">
   <div class="am-box">
     <div class="am-title">Save to Album</div>
@@ -440,7 +431,7 @@ function show(rid,sid,eid,mode){
 // ── KEY GATE ──────────────────────────────────────────────────────────────
 function submitKey(){
   const v=document.getElementById('kip').value.trim();
-  if(!v.startsWith('sk-ant-')){document.getElementById('key-err').style.display='block';return;}
+  if(v.length < 20){document.getElementById('key-err').style.display='block';return;}
   apiKey=v; sessionStorage.setItem('lj_key',v);
   document.getElementById('key-gate').style.display='none';
   document.getElementById('app').style.display='block';
@@ -454,7 +445,6 @@ function changeKey(){
 window.addEventListener('DOMContentLoaded',()=>{
   const saved=sessionStorage.getItem('lj_key');
   if(saved){apiKey=saved;document.getElementById('key-gate').style.display='none';document.getElementById('app').style.display='block';}
-  document.getElementById('kip').addEventListener('keydown',e=>{if(e.key==='Enter')submitKey();});
   renderAlbumsList();
 });
 
@@ -762,7 +752,6 @@ function exportPredictPDF(){
     .kwtag{display:inline-block;background:#f0f0f0;border:1px solid #ddd;padding:3px 10px;border-radius:20px;font-size:11px;margin:3px;font-family:monospace;}
     .footer{margin-top:40px;font-size:10px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:16px;}
   </style></head><body>
-
   <h1>Revenue Intelligence Report</h1>
   <div class="sub">LENS JUDGE v2 · Generated ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}</div>
   ${predictImageData?`<img src="${predictImageData.dataUrl}" style="width:100%;max-height:260px;object-fit:cover;border-radius:12px;margin-bottom:24px;">`:''} 
@@ -789,104 +778,132 @@ function exportPredictPDF(){
 }
 
 // ── ALBUMS ────────────────────────────────────────────────────────────────
-function saveAlbums(){localStorage.setItem(‘lj_albums’,JSON.stringify(albums));}
+function saveAlbums(){localStorage.setItem('lj_albums',JSON.stringify(albums));}
 
-function openAlbums(){document.getElementById(‘albums-panel’).classList.add(‘open’);renderAlbumsList();}
-function closeAlbums(){document.getElementById(‘albums-panel’).classList.remove(‘open’);}
+function openAlbums(){document.getElementById('albums-panel').classList.add('open');renderAlbumsList();}
+function closeAlbums(){document.getElementById('albums-panel').classList.remove('open');}
 
 function createAlbum(){
-const name=document.getElementById(‘new-album-name’).value.trim();
-if(!name)return;
-albums.push({id:‘alb_’+Date.now(),name,items:[]});
-saveAlbums();
-document.getElementById(‘new-album-name’).value=’’;
-renderAlbumsList();
+  const name=document.getElementById('new-album-name').value.trim();
+  if(!name)return;
+  albums.push({id:'alb_'+Date.now(),name,items:[]});
+  saveAlbums();
+  document.getElementById('new-album-name').value='';
+  renderAlbumsList();
 }
 
 function renderAlbumsList(){
-const el=document.getElementById(‘albums-list’);
-if(!albums.length){el.innerHTML=`<div style="color:var(--muted);font-size:12px;font-family:'Lora',serif;text-align:center;padding:20px 0;">No albums yet. Create one below.</div>`;return;}
-el.innerHTML=albums.map(alb=>` <div class="album-item" onclick="viewAlbum('${alb.id}')"> <div style="display:flex;justify-content:space-between;align-items:flex-start"> <div> <div class="album-name">${alb.name}</div> <div class="album-count">${alb.items.length} item${alb.items.length!==1?'s':''}</div> </div> <button onclick="event.stopPropagation();deleteAlbum('${alb.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;">✕</button> </div> <div class="album-thumbs"> ${alb.items.slice(0,5).map(item=>item.imageDataUrl ?`<img class="album-thumb" src="${item.imageDataUrl}">` :`<div class="album-thumb-ph">${item.type===‘brief’?‘⊕’:‘◈’}</div>` ).join('')} ${alb.items.length>5?`<div class="album-thumb-ph" style="font-size:10px;font-family:monospace">+${alb.items.length-5}</div>`:''} </div> </div>`).join(’’);
+  const el=document.getElementById('albums-list');
+  if(!albums.length){el.innerHTML=`<div style="color:var(--muted);font-size:12px;font-family:'Lora',serif;text-align:center;padding:20px 0;">No albums yet. Create one below.</div>`;return;}
+  el.innerHTML=albums.map(alb=>`
+    <div class="album-item" onclick="viewAlbum('${alb.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="album-name">${alb.name}</div>
+          <div class="album-count">${alb.items.length} item${alb.items.length!==1?'s':''}</div>
+        </div>
+        <button onclick="event.stopPropagation();deleteAlbum('${alb.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;">✕</button>
+      </div>
+      <div class="album-thumbs">
+        ${alb.items.slice(0,5).map(item=>item.imageDataUrl
+          ?`<img class="album-thumb" src="${item.imageDataUrl}">`
+          :`<div class="album-thumb-ph">${item.type==='brief'?'⊕':'◈'}</div>`
+        ).join('')}
+        ${alb.items.length>5?`<div class="album-thumb-ph" style="font-size:10px;font-family:monospace">+${alb.items.length-5}</div>`:''}
+      </div>
+    </div>`).join('');
 }
 
 function deleteAlbum(id){
-if(!confirm(‘Delete this album?’))return;
-albums=albums.filter(a=>a.id!==id);
-saveAlbums();renderAlbumsList();
+  if(!confirm('Delete this album?'))return;
+  albums=albums.filter(a=>a.id!==id);
+  saveAlbums();renderAlbumsList();
 }
 
 function viewAlbum(id){
-const alb=albums.find(a=>a.id===id);
-if(!alb)return;
-const el=document.getElementById(‘ap-body’);
-el.innerHTML=` <button onclick="renderAlbumsList();document.getElementById('ap-body').scrollTop=0" class="btn-outline" style="margin-bottom:16px;height:32px;padding:0 12px;font-size:10px;">← Back</button> <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">${alb.name}</div> <div style="font-size:10px;color:var(--muted);margin-bottom:18px">${alb.items.length} items</div> ${alb.items.length===0?`<div style="color:var(--muted);font-size:12px;font-family:'Lora',serif;text-align:center;padding:20px">No items in this album yet.</div>`:''} ${alb.items.map((item,i)=>`
-<div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">
-<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-<div style="font-size:10px;color:var(--muted)">${item.type===‘brief’?‘⊕ SHOOT BRIEF’:‘◈ REVENUE INTEL’}</div>
-<button onclick="removeFromAlbum('${id}',${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;">✕</button>
-</div>
-${item.imageDataUrl?`<img src="${item.imageDataUrl}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;">`:’’ }
-<div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:5px">${item.title||item.overallVerdict||‘Analysis’}</div>
-${item.brief?`<p style="font-family:'Lora',serif;font-size:12px;color:var(--textdim);line-height:1.6">${item.brief}</p>`:’’}
-${item.approvalProbability!=null?`<div style="font-size:11px;color:var(--muted);margin-top:6px">Approval: ${item.approvalProbability}% · Revenue: ${item.estimatedMonthlyRevenue}</div>`:’’}
-</div>`).join('')}`;
+  const alb=albums.find(a=>a.id===id);
+  if(!alb)return;
+  const el=document.getElementById('ap-body');
+  el.innerHTML=`
+    <button onclick="renderAlbumsList();document.getElementById('ap-body').scrollTop=0" class="btn-outline" style="margin-bottom:16px;height:32px;padding:0 12px;font-size:10px;">← Back</button>
+    <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700;margin-bottom:4px">${alb.name}</div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:18px">${alb.items.length} items</div>
+    ${alb.items.length===0?`<div style="color:var(--muted);font-size:12px;font-family:'Lora',serif;text-align:center;padding:20px">No items in this album yet.</div>`:''}
+    ${alb.items.map((item,i)=>`
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
+          <div style="font-size:10px;color:var(--muted)">${item.type==='brief'?'⊕ SHOOT BRIEF':'◈ REVENUE INTEL'}</div>
+          <button onclick="removeFromAlbum('${id}',${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;">✕</button>
+        </div>
+        ${item.imageDataUrl?`<img src="${item.imageDataUrl}" style="width:100%;max-height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;">`:'' }
+        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:5px">${item.title||item.overallVerdict||'Analysis'}</div>
+        ${item.brief?`<p style="font-family:'Lora',serif;font-size:12px;color:var(--textdim);line-height:1.6">${item.brief}</p>`:''}
+        ${item.approvalProbability!=null?`<div style="font-size:11px;color:var(--muted);margin-top:6px">Approval: ${item.approvalProbability}% · Revenue: ${item.estimatedMonthlyRevenue}</div>`:''}
+      </div>`).join('')}`;
 }
 
 function removeFromAlbum(albumId, itemIdx){
-const alb=albums.find(a=>a.id===albumId);
-if(!alb)return;
-alb.items.splice(itemIdx,1);
-saveAlbums();
-viewAlbum(albumId);
+  const alb=albums.find(a=>a.id===albumId);
+  if(!alb)return;
+  alb.items.splice(itemIdx,1);
+  saveAlbums();
+  viewAlbum(albumId);
 }
 
 // ── ALBUM MODAL ───────────────────────────────────────────────────────────
 function openAlbumModal(item){
-if(typeof item===‘string’)item=JSON.parse(item);
-albumModalItem=item;
-albumModalSelectedId=null;
-document.getElementById(‘am-preview’).innerHTML=` <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px"> <div style="font-size:10px;color:var(--muted);margin-bottom:5px">${item.type==='brief'?'⊕ SHOOT BRIEF':'◈ REVENUE INTEL'}</div> <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">${item.title||item.overallVerdict||'Analysis'}</div> </div>`;
-renderAmAlbums();
-document.getElementById(‘album-modal’).classList.add(‘open’);
+  if(typeof item==='string')item=JSON.parse(item);
+  albumModalItem=item;
+  albumModalSelectedId=null;
+  document.getElementById('am-preview').innerHTML=`
+    <div style="background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:12px">
+      <div style="font-size:10px;color:var(--muted);margin-bottom:5px">${item.type==='brief'?'⊕ SHOOT BRIEF':'◈ REVENUE INTEL'}</div>
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700">${item.title||item.overallVerdict||'Analysis'}</div>
+    </div>`;
+  renderAmAlbums();
+  document.getElementById('album-modal').classList.add('open');
 }
-function closeAlbumModal(){document.getElementById(‘album-modal’).classList.remove(‘open’);albumModalItem=null;albumModalSelectedId=null;}
+function closeAlbumModal(){document.getElementById('album-modal').classList.remove('open');albumModalItem=null;albumModalSelectedId=null;}
 
 function renderAmAlbums(){
-document.getElementById(‘am-albums-list’).innerHTML=albums.length===0
-?`<div style="color:var(--muted);font-size:12px;font-family:'Lora',serif;text-align:center;padding:16px">No albums yet — create one below.</div>`
-:albums.map(alb=>` <div class="am-album-row${albumModalSelectedId===alb.id?' selected':''}" onclick="selectAlbum('${alb.id}')"> <div class="am-check${albumModalSelectedId===alb.id?' on':''}">${albumModalSelectedId===alb.id?'✓':''}</div> <div style="flex:1"><div style="font-size:13px">${alb.name}</div><div style="font-size:10px;color:var(--muted)">${alb.items.length} items</div></div> </div>`).join(’’);
+  document.getElementById('am-albums-list').innerHTML=albums.length===0
+    ?`<div style="color:var(--muted);font-size:12px;font-family:'Lora',serif;text-align:center;padding:16px">No albums yet — create one below.</div>`
+    :albums.map(alb=>`
+      <div class="am-album-row${albumModalSelectedId===alb.id?' selected':''}" onclick="selectAlbum('${alb.id}')">
+        <div class="am-check${albumModalSelectedId===alb.id?' on':''}">${albumModalSelectedId===alb.id?'✓':''}</div>
+        <div style="flex:1"><div style="font-size:13px">${alb.name}</div><div style="font-size:10px;color:var(--muted)">${alb.items.length} items</div></div>
+      </div>`).join('');
 }
 function selectAlbum(id){albumModalSelectedId=id;renderAmAlbums();}
 
 function createAndSave(){
-const name=document.getElementById(‘am-new-name’).value.trim();
-if(!name)return;
-const alb={id:‘alb_’+Date.now(),name,items:[]};
-albums.push(alb);saveAlbums();
-albumModalSelectedId=alb.id;
-document.getElementById(‘am-new-name’).value=’’;
-renderAmAlbums();
-confirmSaveToAlbum();
+  const name=document.getElementById('am-new-name').value.trim();
+  if(!name)return;
+  const alb={id:'alb_'+Date.now(),name,items:[]};
+  albums.push(alb);saveAlbums();
+  albumModalSelectedId=alb.id;
+  document.getElementById('am-new-name').value='';
+  renderAmAlbums();
+  confirmSaveToAlbum();
 }
 
 function confirmSaveToAlbum(){
-if(!albumModalSelectedId||!albumModalItem){alert(‘Please select or create an album first.’);return;}
-const alb=albums.find(a=>a.id===albumModalSelectedId);
-if(!alb)return;
-alb.items.push({…albumModalItem, savedAt:new Date().toISOString()});
-saveAlbums();
-closeAlbumModal();
-// Show brief confirmation
-const toast=document.createElement(‘div’);
-toast.textContent=`Saved to "${alb.name}"`;
-Object.assign(toast.style,{position:‘fixed’,bottom:‘24px’,left:‘50%’,transform:‘translateX(-50%)’,
-background:C.accent,color:’#07080f’,padding:‘10px 20px’,borderRadius:‘20px’,
-fontFamily:‘Space Mono,monospace’,fontSize:‘12px’,fontWeight:‘700’,zIndex:‘999’,
-transition:‘opacity .3s’});
-document.body.appendChild(toast);
-setTimeout(()=>{toast.style.opacity=‘0’;setTimeout(()=>toast.remove(),300);},2000);
+  if(!albumModalSelectedId||!albumModalItem){alert('Please select or create an album first.');return;}
+  const alb=albums.find(a=>a.id===albumModalSelectedId);
+  if(!alb)return;
+  alb.items.push({...albumModalItem, savedAt:new Date().toISOString()});
+  saveAlbums();
+  closeAlbumModal();
+  // Show brief confirmation
+  const toast=document.createElement('div');
+  toast.textContent=`Saved to "${alb.name}"`;
+  Object.assign(toast.style,{position:'fixed',bottom:'24px',left:'50%',transform:'translateX(-50%)',
+    background:C.accent,color:'#07080f',padding:'10px 20px',borderRadius:'20px',
+    fontFamily:'Space Mono,monospace',fontSize:'12px',fontWeight:'700',zIndex:'999',
+    transition:'opacity .3s'});
+  document.body.appendChild(toast);
+  setTimeout(()=>{toast.style.opacity='0';setTimeout(()=>toast.remove(),300);},2000);
 }
 </script>
-
 </body>
 </html>
