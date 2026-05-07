@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lens Judge v2 — Stock Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07080f;
+    --surface: #0d0f1a;
+    --surface2: #13162200;
+    --border: #ffffff0d;
+    --border2: #ffffff18;
+    --accent: #e8ff47;
+    --green: #3dffa0;
+    --red: #ff4f4f;
+    --amber: #ffb547;
+    --muted: #ffffff40;
+    --text: #ffffffdd;
+    --textdim: #ffffff55;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    min-height: 100vh;
+  }
+
+  /* ── API KEY GATE ── */
+  #key-gate {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, #e8ff4712 0%, transparent 70%),
+      var(--bg);
+  }
+  #key-gate .box {
+    width: 100%;
+    max-width: 480px;
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 40px;
+  }
+  #key-gate .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent) 0%, #fff 65%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 6px;
+  }
+  #key-gate .tagline {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-bottom: 32px;
+  }
+  #key-gate label {
+    display: block;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  #key-gate input[type=password] {
+    width: 100%;
+    background: #ffffff07;
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    margin-bottom: 12px;
+    transition: border-color 0.2s;
+  }
+  #key-gate input[type=password]:focus { border-color: var(--accent); }
+  #key-gate .hint {
+    font-size: 11px;
+    color: var(--textdim);
+    font-family: 'Lora', serif;
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+  #key-gate .hint a { color: var(--accent); text-decoration: none; }
+
+  /* ── MAIN APP ── */
+  #app { display: none; }
+
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 32px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+  }
+  .header-top {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    margin-bottom: 22px;
+  }
+  .logo-wrap .eyebrow {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    margin-bottom: 5px;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 38px;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent) 0%, #fff 60%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+  .header-desc {
+    font-family: 'Lora', serif;
+    font-size: 13px;
+    color: var(--textdim);
+    line-height: 1.6;
+    max-width: 320px;
+    padding-bottom: 4px;
+  }
+  .key-indicator {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    color: var(--muted);
+    cursor: pointer;
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    align-self: flex-start;
+    margin-top: 4px;
+  }
+  .key-indicator:hover { border-color: var(--border2); color: var(--text); }
+  .key-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 0; }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    padding: 10px 20px 12px;
+    color: var(--muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    transition: all 0.15s;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+  }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-btn:hover:not(.active) { color: var(--text); }
+  .tab-sub { font-size: 9px; opacity: 0.5; letter-spacing: 0.12em; }
+
+  /* ── CONTENT ── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 28px 32px 80px;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .section-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  /* ── INPUTS ── */
+  .input-row { display: flex; gap: 10px; }
+  input[type=text], input[type=search], textarea, select {
+    background: #ffffff06;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: var(--text);
+    font-family: 'Lora', serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+  input[type=text]:focus, input[type=search]:focus, textarea:focus, select:focus {
+    border-color: var(--accent);
+  }
+  select {
+    background: var(--surface);
+    cursor: pointer;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #07080f;
+    border: none;
+    border-radius: 10px;
+    padding: 0 22px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: opacity 0.15s;
+  }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-primary:hover:not(:disabled) { opacity: 0.85; }
+
+  /* ── GRID HELPERS ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+
+  /* ── BIG NUMBERS ── */
+  .big-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .big-num-sm {
+    font-family: 'Syne', sans-serif;
+    font-size: 34px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  /* ── TREND BAR ── */
+  .bar-wrap { background: #ffffff09; border-radius: 3px; height: 5px; overflow: hidden; flex: 1; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 1s cubic-bezier(.4,0,.2,1); }
+
+  /* ── PILL ── */
+  .pill {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 40px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    border: 1px solid;
+  }
+
+  /* ── KEYWORD TAG ── */
+  .kw-tag {
+    display: inline-block;
+    background: #ffffff07;
+    border: 1px solid var(--border);
+    color: var(--textdim);
+    padding: 4px 11px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    margin: 3px;
+  }
+
+  /* ── LEFT BORDER ITEMS ── */
+  .border-item { padding-left: 14px; margin-bottom: 12px; }
+  .border-item .item-title { font-size: 12px; font-family: 'Space Mono', monospace; margin-bottom: 4px; }
+  .border-item .item-body { font-family: 'Lora', serif; font-size: 12px; color: var(--textdim); line-height: 1.6; }
+
+  /* ── SPINNER ── */
+  .spinner-wrap { text-align: center; padding: 50px 0; }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin: 0 auto 14px;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner-label { font-size: 11px; color: var(--muted); }
+
+  /* ── EMPTY STATE ── */
+  .empty { text-align: center; padding: 60px 20px; color: var(--textdim); }
+  .empty .icon { font-size: 32px; opacity: 0.3; margin-bottom: 12px; }
+  .empty p { font-family: 'Lora', serif; font-size: 14px; line-height: 1.7; }
+
+  /* ── PROSE ── */
+  .prose { font-family: 'Lora', serif; font-size: 14px; line-height: 1.8; color: var(--text); }
+  .prose-sm { font-family: 'Lora', serif; font-size: 12px; line-height: 1.6; color: var(--textdim); }
+
+  /* ── HIGHLIGHT CARD ── */
+  .card-accent {
+    background: rgba(232,255,71,0.04);
+    border-color: rgba(232,255,71,0.18);
+  }
+  .card-green { background: rgba(61,255,160,0.04); border-color: rgba(61,255,160,0.15); }
+
+  /* ── INLINE ROW ── */
+  .metric-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: #ffffff03;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 8px;
+  }
+  .metric-row .label { font-size: 12px; flex: 1; }
+  .metric-row .note { font-family: 'Lora', serif; font-size: 11px; color: var(--textdim); flex: 1; }
+
+  /* ── DROP ZONE ── */
+  .drop-zone {
+    border: 2px dashed var(--border2);
+    border-radius: 12px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 10px;
+  }
+  .drop-zone:hover, .drop-zone.over { border-color: var(--accent); background: rgba(232,255,71,0.03); }
+  .drop-zone .dz-icon { font-size: 24px; margin-bottom: 8px; opacity: 0.5; }
+  .drop-zone .dz-label { font-size: 11px; color: var(--muted); }
+  .drop-zone img { max-height: 180px; object-fit: contain; border-radius: 8px; }
+
+  /* ── SHOOT BRIEF CARD ── */
+  .brief-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    animation: fadeUp 0.35s ease both;
+  }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  .brief-card.saved { border-color: rgba(232,255,71,0.35); }
+  .brief-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; gap: 12px; }
+  .brief-title { font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 700; line-height: 1.3; }
+  .save-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 5px 13px;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .save-btn.saved { background: var(--accent); color: #07080f; border-color: var(--accent); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    header, main { padding-left: 16px; padding-right: 16px; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .tabs { overflow-x: auto; }
+    .tab-btn { padding: 10px 14px 12px; font-size: 10px; }
+    .big-num { font-size: 38px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ API KEY GATE ══════════════════════════════════════════════════════════ -->
+<div id="key-gate">
+  <div class="box">
+    <div class="logo">LENS JUDGE</div>
+    <div class="tagline">◈ STOCK INTELLIGENCE PLATFORM · v2</div>
+    <label for="api-key-input">Anthropic API Key</label>
+    <input type="password" id="api-key-input" placeholder="sk-ant-api03-…" autocomplete="off">
+    <div class="hint">
+      Your key is stored only in <strong>sessionStorage</strong> — it's never sent anywhere except directly to <a href="https://api.anthropic.com" target="_blank">api.anthropic.com</a>. It's cleared when you close the tab.<br><br>
+      Don't have a key? Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
+    </div>
+    <button class="btn-primary" id="key-submit" style="width:100%;height:46px;font-size:13px;" onclick="submitKey()">
+      Enter →
+    </button>
+    <div id="key-error" style="color:var(--red);font-size:11px;margin-top:10px;display:none;">
+      Please enter a valid API key (starts with sk-ant-)
+    </div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══════════════════════════════════════════════════════════════ -->
+<div id="app">
+  <header>
+    <div class="header-inner">
+      <div class="header-top">
+        <div class="logo-wrap">
+          <div class="eyebrow">◈ STOCK INTELLIGENCE PLATFORM · v2</div>
+          <div class="logo">LENS JUDGE</div>
+        </div>
+        <div class="header-desc">Demand intelligence · Saturation gaps · Shoot briefs · Revenue prediction</div>
+        <div class="key-indicator" onclick="changeKey()" title="Change API key">
+          <span class="key-dot"></span> API KEY SET
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('demand',this)">
+          ◎ Demand<span class="tab-sub">What's selling now</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('saturation',this)">
+          ⊘ Saturation<span class="tab-sub">Gap analysis</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('shoots',this)">
+          ⊕ Shoot Generator<span class="tab-sub">What to shoot</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('predict',this)">
+          ◈ Revenue Intel<span class="tab-sub">Predict & score</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── DEMAND TAB ─────────────────────────────────────────────────────── -->
+    <div id="tab-demand" class="tab-panel active">
+      <div class="card">
+        <div class="section-label">Enter a niche or category</div>
+        <div class="input-row">
+          <input type="text" id="demand-input" placeholder='e.g. "remote work", "Australian outback", "sustainable packaging"…' onkeydown="if(event.key==='Enter')runDemand()">
+          <button class="btn-primary" style="height:48px;" onclick="runDemand()">Analyse →</button>
+        </div>
+      </div>
+      <div id="demand-spinner" class="spinner-wrap" style="display:none">
+        <div class="spinner"></div>
+        <div class="spinner-label">Consulting the market…</div>
+      </div>
+      <div id="demand-results"></div>
+      <div class="empty" id="demand-empty">
+        <div class="icon">◎</div>
+        <p>Enter a niche to see trending keywords,<br>rising categories and seasonal shifts.</p>
+      </div>
+    </div>
+
+    <!-- ── SATURATION TAB ─────────────────────────────────────────────────── -->
+    <div id="tab-saturation" class="tab-panel">
+      <div class="card">
+        <div class="section-label">Analyse a topic or subject</div>
+        <div class="input-row">
+          <input type="text" id="sat-input" placeholder='e.g. "coffee cups", "diverse business teams", "solar energy"…' onkeydown="if(event.key==='Enter')runSaturation()">
+          <button class="btn-primary" style="height:48px;" onclick="runSaturation()">Analyse →</button>
+        </div>
+      </div>
+      <div id="sat-spinner" class="spinner-wrap" style="display:none">
+        <div class="spinner"></div>
+        <div class="spinner-label">Mapping the supply gap…</div>
+      </div>
+      <div id="sat-results"></div>
+      <div class="empty" id="sat-empty">
+        <div class="icon">⊘</div>
+        <p>Enter a topic to see oversupplied angles to avoid<br>and undersupplied gaps to exploit.</p>
+      </div>
+    </div>
+
+    <!-- ── SHOOTS TAB ─────────────────────────────────────────────────────── -->
+    <div id="tab-shoots" class="tab-panel">
+      <div class="card">
+        <div class="section-label">Your context (optional but recommended)</div>
+        <input type="text" id="shoots-context" placeholder='Your specialty e.g. "portrait photographer", "drone / aerial", "macro"…' style="margin-bottom:10px;">
+        <div class="grid-2" style="margin-bottom:10px;">
+          <input type="text" id="shoots-location" placeholder='Your location e.g. "Western Australia", "Tokyo"…'>
+          <select id="shoots-style">
+            <option value="any">Any style</option>
+            <option value="lifestyle">Lifestyle / People</option>
+            <option value="landscape">Landscape / Nature</option>
+            <option value="macro">Macro / Abstract</option>
+            <option value="aerial">Aerial / Drone</option>
+            <option value="architecture">Architecture / Urban</option>
+            <option value="product">Product / Food</option>
+          </select>
+        </div>
+        <button class="btn-primary" style="width:100%;height:46px;font-size:13px;" onclick="runShoots()">Generate Shoot Briefs →</button>
+      </div>
+      <div id="shoots-spinner" class="spinner-wrap" style="display:none">
+        <div class="spinner"></div>
+        <div class="spinner-label">Generating briefs…</div>
+      </div>
+      <div id="saved-banner" style="display:none" class="card card-accent" id="saved-briefs-bar">
+        <div class="section-label">Saved briefs</div>
+        <div id="saved-pills"></div>
+      </div>
+      <div id="shoots-results"></div>
+      <div class="empty" id="shoots-empty">
+        <div class="icon">⊕</div>
+        <p>Generate hyper-specific, commercially-driven shoot briefs<br>tailored to your style and location.</p>
+      </div>
+    </div>
+
+    <!-- ── PREDICT TAB ─────────────────────────────────────────────────────── -->
+    <div id="tab-predict" class="tab-panel">
+      <div class="card">
+        <div class="section-label">Upload a photo or describe your concept</div>
+        <div class="drop-zone" id="drop-zone" onclick="document.getElementById('predict-file').click()"
+          ondragover="event.preventDefault();this.classList.add('over')"
+          ondragleave="this.classList.remove('over')"
+          ondrop="handleDrop(event)">
+          <div id="dz-inner">
+            <div class="dz-icon">⬆</div>
+            <div class="dz-label">Drop image here or click to upload</div>
+          </div>
+          <input type="file" id="predict-file" accept="image/*" style="display:none" onchange="handleFileSelect(this)">
+        </div>
+        <div class="input-row" style="margin-top:0;">
+          <input type="text" id="predict-desc" placeholder="Or describe a concept / photo you're planning to shoot…">
+          <button class="btn-primary" style="height:48px;" onclick="runPredict()">Predict →</button>
+        </div>
+      </div>
+      <div id="predict-spinner" class="spinner-wrap" style="display:none">
+        <div class="spinner"></div>
+        <div class="spinner-label">Running revenue analysis…</div>
+      </div>
+      <div id="predict-results"></div>
+      <div class="empty" id="predict-empty">
+        <div class="icon">◈</div>
+        <p>Upload a photo or describe a concept to get approval probability,<br>revenue estimates, saturation risk, and agency recommendations.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let apiKey = '';
+let predictImageData = null;
+let savedBriefs = [];
+
+// ── KEY GATE ──────────────────────────────────────────────────────────────────
+function submitKey() {
+  const val = document.getElementById('api-key-input').value.trim();
+  if (!val.startsWith('sk-ant-')) {
+    document.getElementById('key-error').style.display = 'block';
+    return;
+  }
+  apiKey = val;
+  sessionStorage.setItem('lj_key', val);
+  document.getElementById('key-gate').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+}
+
+function changeKey() {
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('key-gate').style.display = 'flex';
+  document.getElementById('api-key-input').value = '';
+  apiKey = '';
+  sessionStorage.removeItem('lj_key');
+}
+
+// On load: restore from session
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = sessionStorage.getItem('lj_key');
+  if (saved) {
+    apiKey = saved;
+    document.getElementById('key-gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  }
+  document.getElementById('api-key-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitKey();
+  });
+});
+
+// ── TAB SWITCHING ──────────────────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── API CALL ───────────────────────────────────────────────────────────────────
+async function callClaude(prompt, imageData = null) {
+  const content = imageData
+    ? [
+        { type: 'image', source: { type: 'base64', media_type: imageData.type, data: imageData.data } },
+        { type: 'text', text: prompt }
+      ]
+    : [{ type: 'text', text: prompt }];
+
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1500,
+      messages: [{ role: 'user', content }]
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${res.status}`);
+  }
+
+  const data = await res.json();
+  const text = data.content?.map(b => b.text || '').join('') || '';
+  return text.replace(/```json|```/g, '').trim();
+}
+
+function parseJSON(raw) {
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+// ── COLOUR HELPERS ─────────────────────────────────────────────────────────────
+function scoreColor(s) {
+  if (s >= 70) return 'var(--green)';
+  if (s >= 45) return 'var(--amber)';
+  return 'var(--red)';
+}
+function satColor(v) {
+  if (v === 'Low') return 'var(--green)';
+  if (v === 'Medium') return 'var(--amber)';
+  return 'var(--red)';
+}
+function valueColor(v) {
+  if (v === 'Very High') return 'var(--accent)';
+  if (v === 'High') return 'var(--green)';
+  if (v === 'Medium') return 'var(--amber)';
+  return 'var(--muted)';
+}
+function verdictColor(v) {
+  if (v === 'Gold Mine') return 'var(--accent)';
+  if (v === 'Opportunity') return 'var(--green)';
+  if (v === 'Caution') return 'var(--amber)';
+  return 'var(--red)';
+}
+function impactColor(v) {
+  if (v === 'High') return 'var(--green)';
+  if (v === 'Medium') return 'var(--amber)';
+  return 'var(--muted)';
+}
+
+function pill(label, color) {
+  return `<span class="pill" style="color:${color};border-color:${color}44;background:${color}12">${label}</span>`;
+}
+function bar(value, color) {
+  return `<div class="bar-wrap"><div class="bar-fill" style="width:${value}%;background:${color}"></div></div>`;
+}
+function kwTags(arr) {
+  return arr.map(k => `<span class="kw-tag">${k}</span>`).join('');
+}
+
+function showSection(resultsId, spinnerId, emptyId, show) {
+  document.getElementById(spinnerId).style.display = show === 'loading' ? 'block' : 'none';
+  document.getElementById(resultsId).style.display = show === 'results' ? 'block' : 'none';
+  document.getElementById(emptyId).style.display = show === 'empty' ? 'block' : 'none';
+}
+
+// ── DEMAND ─────────────────────────────────────────────────────────────────────
+async function runDemand() {
+  const niche = document.getElementById('demand-input').value.trim();
+  if (!niche) return;
+  showSection('demand-results', 'demand-spinner', 'demand-empty', 'loading');
+
+  try {
+    const prompt = `You are a senior stock photo market analyst with deep knowledge of Adobe Stock, Shutterstock, and Getty trends data.
+
+A photographer wants to understand current demand for: "${niche}"
+
+Respond ONLY with valid JSON (no markdown):
+{
+  "overallMomentum": <0-100 integer>,
+  "momentumLabel": "<Rising|Stable|Declining|Emerging>",
+  "trendingSince": "<e.g. Q2 2024>",
+  "trendingKeywords": [
+    { "keyword": "<string>", "growth": <0-100>, "volume": "<Low|Medium|High|Very High>" }
+  ],
+  "risingCategories": [
+    { "name": "<string>", "insight": "<1 sentence why this is rising>" }
+  ],
+  "seasonalShifts": [
+    { "period": "<e.g. Q4>", "opportunity": "<1 sentence specific opportunity>" }
+  ],
+  "downloadMomentum": "<2-3 sentence summary of download trends>",
+  "keyInsight": "<Single most important insight a photographer needs to know right now>"
+}`;
+
+    const raw = await callClaude(prompt);
+    const d = parseJSON(raw);
+    if (!d) throw new Error('Parse failed');
+
+    const mc = scoreColor(d.overallMomentum);
+    const html = `
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-label">Market Momentum</div>
+          <div class="big-num" style="color:${mc}">${d.overallMomentum}</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            ${pill(d.momentumLabel, mc)}
+            <span style="font-size:10px;color:var(--textdim)">since ${d.trendingSince}</span>
+          </div>
+          ${bar(d.overallMomentum, mc)}
+        </div>
+        <div class="card card-accent">
+          <div class="section-label">Key Insight</div>
+          <p class="prose" style="font-size:13px">${d.keyInsight}</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Trending Keywords</div>
+        ${d.trendingKeywords.map(kw => `
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+            <div style="font-size:12px;width:200px;flex-shrink:0">${kw.keyword}</div>
+            ${bar(kw.growth, 'var(--green)')}
+            <div style="color:var(--green);font-size:11px;width:32px;text-align:right">+${kw.growth}</div>
+            ${pill(kw.volume, 'var(--muted)')}
+          </div>`).join('')}
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-label">Rising Categories</div>
+          ${d.risingCategories.map(c => `
+            <div class="border-item" style="border-left:2px solid var(--green)">
+              <div class="item-title" style="color:var(--green)">${c.name}</div>
+              <div class="item-body">${c.insight}</div>
+            </div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="section-label">Seasonal Shifts</div>
+          ${d.seasonalShifts.map(s => `
+            <div class="border-item" style="border-left:2px solid var(--amber)">
+              <div class="item-title" style="color:var(--amber)">${s.period}</div>
+              <div class="item-body">${s.opportunity}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Download Momentum</div>
+        <p class="prose">${d.downloadMomentum}</p>
+      </div>`;
+
+    document.getElementById('demand-results').innerHTML = html;
+    showSection('demand-results', 'demand-spinner', 'demand-empty', 'results');
+  } catch (e) {
+    document.getElementById('demand-results').innerHTML = `<div class="card" style="color:var(--red)">${e.message}</div>`;
+    showSection('demand-results', 'demand-spinner', 'demand-empty', 'results');
+  }
+}
+
+// ── SATURATION ─────────────────────────────────────────────────────────────────
+async function runSaturation() {
+  const topic = document.getElementById('sat-input').value.trim();
+  if (!topic) return;
+  showSection('sat-results', 'sat-spinner', 'sat-empty', 'loading');
+
+  try {
+    const prompt = `You are a stock photo market strategist who specialises in identifying supply/demand gaps.
+
+Analyse saturation for: "${topic}"
+
+Respond ONLY with valid JSON (no markdown):
+{
+  "saturationScore": <0-100>,
+  "demandScore": <0-100>,
+  "opportunityScore": <0-100>,
+  "verdict": "<Avoid|Caution|Opportunity|Gold Mine>",
+  "verdictReason": "<2 sentences>",
+  "oversupplied": [
+    { "angle": "<string>", "reason": "<why oversupplied>" }
+  ],
+  "undersupplied": [
+    { "angle": "<string>", "reason": "<why this gap exists>" }
+  ],
+  "adjacentOpportunities": [
+    { "niche": "<string>", "saturation": <0-100>, "demand": <0-100>, "note": "<1 sentence>" }
+  ],
+  "strategicAdvice": "<3-4 sentence strategic recommendation>"
+}`;
+
+    const raw = await callClaude(prompt);
+    const d = parseJSON(raw);
+    if (!d) throw new Error('Parse failed');
+    const vc = verdictColor(d.verdict);
+
+    const html = `
+      <div class="grid-3">
+        ${[
+          {label:'Saturation', val:d.saturationScore, c:d.saturationScore>70?'var(--red)':d.saturationScore>45?'var(--amber)':'var(--green)'},
+          {label:'Demand', val:d.demandScore, c:d.demandScore>70?'var(--green)':d.demandScore>45?'var(--amber)':'var(--red)'},
+          {label:'Opportunity', val:d.opportunityScore, c:d.opportunityScore>60?'var(--green)':d.opportunityScore>35?'var(--amber)':'var(--red)'}
+        ].map(m => `
+          <div class="card">
+            <div class="section-label">${m.label}</div>
+            <div class="big-num" style="color:${m.c}">${m.val}</div>
+            ${bar(m.val, m.c)}
+          </div>`).join('')}
+      </div>
+
+      <div class="card" style="background:${vc}0a;border-color:${vc}28;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:14px">
+          ${pill(d.verdict, vc)}
+          <p class="prose" style="font-size:13px">${d.verdictReason}</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="section-label">⊘ Oversupplied — avoid</div>
+          ${d.oversupplied.map(o => `
+            <div class="border-item" style="border-left:2px solid var(--red)">
+              <div class="item-title" style="color:var(--red)">${o.angle}</div>
+              <div class="item-body">${o.reason}</div>
+            </div>`).join('')}
+        </div>
+        <div class="card">
+          <div class="section-label">⊕ Undersupplied — shoot these</div>
+          ${d.undersupplied.map(u => `
+            <div class="border-item" style="border-left:2px solid var(--green)">
+              <div class="item-title" style="color:var(--green)">${u.angle}</div>
+              <div class="item-body">${u.reason}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Adjacent Opportunities</div>
+        ${d.adjacentOpportunities.map(a => `
+          <div class="metric-row">
+            <div class="label">${a.niche}</div>
+            <div>${pill('D:'+a.demand,'var(--green)')} ${pill('S:'+a.saturation,'var(--red)')}</div>
+            <div class="note">${a.note}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="card card-accent">
+        <div class="section-label">Strategic Advice</div>
+        <p class="prose">${d.strategicAdvice}</p>
+      </div>`;
+
+    document.getElementById('sat-results').innerHTML = html;
+    showSection('sat-results', 'sat-spinner', 'sat-empty', 'results');
+  } catch (e) {
+    document.getElementById('sat-results').innerHTML = `<div class="card" style="color:var(--red)">${e.message}</div>`;
+    showSection('sat-results', 'sat-spinner', 'sat-empty', 'results');
+  }
+}
+
+// ── SHOOTS ─────────────────────────────────────────────────────────────────────
+async function runShoots() {
+  const context = document.getElementById('shoots-context').value.trim();
+  const location = document.getElementById('shoots-location').value.trim();
+  const style = document.getElementById('shoots-style').value;
+  showSection('shoots-results', 'shoots-spinner', 'shoots-empty', 'loading');
+  document.getElementById('saved-banner').style.display = 'none';
+
+  try {
+    const prompt = `You are a commercial stock photography director specialising in high-value, undersupplied shoot briefs.
+
+Generate shoot briefs for:
+- Specialty: "${context || 'general photography'}"
+- Style: "${style}"
+- Location: "${location || 'unspecified'}"
+
+Highly specific, commercially-driven briefs targeting real market gaps. Not generic.
+
+Respond ONLY with valid JSON (no markdown):
+{
+  "briefs": [
+    {
+      "id": "<unique 6-char string>",
+      "title": "<punchy 4-8 word title>",
+      "brief": "<2-3 sentences: exactly what to shoot, how, and why it sells>",
+      "commercialUse": "<who buys this and for what>",
+      "estimatedValue": "<Low|Medium|High|Very High>",
+      "saturationLevel": "<Low|Medium|High>",
+      "urgency": "<Evergreen|Seasonal|Trending Now>",
+      "keywords": [<8-12 keywords>],
+      "agencies": [<best 1-3 agencies>],
+      "props": [<0-4 props or requirements>]
+    }
+  ]
+}
+
+Generate exactly 6 briefs. Diverse subjects, all commercially strong.`;
+
+    const raw = await callClaude(prompt);
+    const d = parseJSON(raw);
+    if (!d?.briefs) throw new Error('Parse failed');
+    savedBriefs = [];
+    renderBriefs(d.briefs);
+    showSection('shoots-results', 'shoots-spinner', 'shoots-empty', 'results');
+  } catch (e) {
+    document.getElementById('shoots-results').innerHTML = `<div class="card" style="color:var(--red)">${e.message}</div>`;
+    showSection('shoots-results', 'shoots-spinner', 'shoots-empty', 'results');
+  }
+}
+
+function renderBriefs(briefs) {
+  const html = briefs.map((b, i) => {
+    const vc = valueColor(b.estimatedValue);
+    const sc = satColor(b.saturationLevel);
+    const uc = b.urgency === 'Trending Now' ? 'var(--accent)' : 'var(--muted)';
+    const isSaved = savedBriefs.find(x => x.id === b.id);
+    return `<div class="brief-card ${isSaved ? 'saved' : ''}" id="brief-${b.id}" style="animation-delay:${i*60}ms">
+      <div class="brief-header">
+        <div class="brief-title">${b.title}</div>
+        <button class="save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSave(${JSON.stringify(b).replace(/"/g,'&quot;')})">
+          ${isSaved ? '✓ Saved' : '+ Save'}
+        </button>
+      </div>
+      <div style="margin-bottom:10px;display:flex;flex-wrap:wrap;gap:6px">
+        ${pill('Value: '+b.estimatedValue, vc)}
+        ${pill('Supply: '+b.saturationLevel, sc)}
+        ${pill(b.urgency, uc)}
+      </div>
+      <p class="prose" style="margin-bottom:10px">${b.brief}</p>
+      <p class="prose-sm" style="font-style:italic;margin-bottom:12px">Who buys it: ${b.commercialUse}</p>
+      <div style="margin-bottom:10px">${kwTags(b.keywords)}</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${b.agencies.map(a => pill(a, 'var(--green)')).join('')}
+        ${b.props?.length ? `<span style="font-size:10px;color:var(--muted);align-self:center">PROPS: ${b.props.join(' · ')}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('shoots-results').innerHTML = html;
+}
+
+function toggleSave(briefStr) {
+  const brief = typeof briefStr === 'string' ? JSON.parse(briefStr) : briefStr;
+  const idx = savedBriefs.findIndex(x => x.id === brief.id);
+  if (idx > -1) savedBriefs.splice(idx, 1);
+  else savedBriefs.push(brief);
+  updateSavedBanner();
+  // Re-render card state
+  const card = document.getElementById('brief-' + brief.id);
+  if (card) {
+    const isSaved = savedBriefs.find(x => x.id === brief.id);
+    card.classList.toggle('saved', !!isSaved);
+    const btn = card.querySelector('.save-btn');
+    btn.textContent = isSaved ? '✓ Saved' : '+ Save';
+    btn.classList.toggle('saved', !!isSaved);
+  }
+}
+
+function updateSavedBanner() {
+  const banner = document.getElementById('saved-banner');
+  if (savedBriefs.length === 0) { banner.style.display = 'none'; return; }
+  banner.style.display = 'block';
+  document.getElementById('saved-pills').innerHTML = savedBriefs.map(b => pill(b.title, 'var(--accent)')).join(' ');
+}
+
+// ── PREDICT ─────────────────────────────────────────────────────────────────────
+function handleFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  loadPreviewFile(file);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) loadPreviewFile(file);
+}
+
+function loadPreviewFile(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const result = ev.target.result;
+    predictImageData = { type: file.type, data: result.split(',')[1] };
+    document.getElementById('dz-inner').innerHTML = `<img src="${result}" alt="preview">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function runPredict() {
+  const desc = document.getElementById('predict-desc').value.trim();
+  if (!predictImageData && !desc) return;
+  showSection('predict-results', 'predict-spinner', 'predict-empty', 'loading');
+
+  try {
+    const prompt = `You are a senior stock photography revenue analyst. ${predictImageData ? 'Analyse this image' : `Analyse this photo concept: "${desc}"`} for commercial stock photography potential.
+
+Be rigorous and honest. Base your analysis on real stock market dynamics.
+
+Respond ONLY with valid JSON (no markdown):
+{
+  "approvalProbability": <0-100>,
+  "approvalNotes": "<2 sentences on approval chances>",
+  "commercialValue": "<Very Low|Low|Medium|High|Very High>",
+  "estimatedMonthlyDownloads": "<e.g. 0-2|2-10|10-30|30-100|100+>",
+  "estimatedMonthlyRevenue": "<e.g. $0-5|$5-25|$25-75|$75-200|$200+>",
+  "revenueHorizon": "<e.g. 3-6 months>",
+  "saturationRisk": <0-100>,
+  "competitionLevel": "<Low|Medium|High|Very High>",
+  "bestAgencies": [
+    { "agency": "<name>", "fit": <0-100>, "reason": "<1 sentence>" }
+  ],
+  "keywordsToRank": [<10-15 keywords>],
+  "improvementActions": [
+    { "action": "<specific thing to do>", "impact": "<Low|Medium|High>", "effort": "<Low|Medium|High>" }
+  ],
+  "overallVerdict": "<1-2 sentences honest verdict>"
+}`;
+
+    const raw = await callClaude(prompt, predictImageData);
+    const d = parseJSON(raw);
+    if (!d) throw new Error('Parse failed');
+
+    const ac = d.approvalProbability >= 75 ? 'var(--green)' : d.approvalProbability >= 50 ? 'var(--amber)' : 'var(--red)';
+    const src = d.saturationRisk > 70 ? 'var(--red)' : d.saturationRisk > 45 ? 'var(--amber)' : 'var(--green)';
+
+    const html = `
+      <div class="grid-3">
+        <div class="card">
+          <div class="section-label">Approval Probability</div>
+          <div class="big-num" style="color:${ac}">${d.approvalProbability}%</div>
+          ${bar(d.approvalProbability, ac)}
+        </div>
+        <div class="card">
+          <div class="section-label">Est. Monthly Revenue</div>
+          <div class="big-num-sm" style="color:var(--accent)">${d.estimatedMonthlyRevenue}</div>
+          <div style="font-size:10px;color:var(--textdim)">${d.estimatedMonthlyDownloads} downloads/mo · revenue in ~${d.revenueHorizon}</div>
+        </div>
+        <div class="card">
+          <div class="section-label">Saturation Risk</div>
+          <div class="big-num" style="color:${src}">${d.saturationRisk}</div>
+          ${bar(d.saturationRisk, src)}
+        </div>
+      </div>
+
+      <div class="card card-accent">
+        <div class="section-label">Overall Verdict</div>
+        <p class="prose" style="margin-bottom:8px">${d.overallVerdict}</p>
+        <p class="prose-sm">${d.approvalNotes}</p>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Best Agency Fits</div>
+        ${d.bestAgencies.map(a => `
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+            <div style="font-size:12px;width:130px;flex-shrink:0">${a.agency}</div>
+            ${bar(a.fit, 'var(--green)')}
+            <div style="color:var(--green);font-size:11px;width:36px;text-align:right">${a.fit}%</div>
+            <div class="prose-sm" style="flex:1">${a.reason}</div>
+          </div>`).join('')}
+      </div>
+
+      <div class="card">
+        <div class="section-label">Improvement Actions</div>
+        ${d.improvementActions.map(a => `
+          <div class="metric-row">
+            <div class="label prose-sm" style="color:var(--text)">${a.action}</div>
+            ${pill('Impact: '+a.impact, impactColor(a.impact))}
+            ${pill('Effort: '+a.effort, a.effort==='Low'?'var(--green)':a.effort==='Medium'?'var(--amber)':'var(--red)')}
+          </div>`).join('')}
+      </div>
+
+      <div class="card">
+        <div class="section-label">High-Value Keywords</div>
+        ${kwTags(d.keywordsToRank)}
+      </div>`;
+
+    document.getElementById('predict-results').innerHTML = html;
+    showSection('predict-results', 'predict-spinner', 'predict-empty', 'results');
+  } catch (e) {
+    document.getElementById('predict-results').innerHTML = `<div class="card" style="color:var(--red)">${e.message}</div>`;
+    showSection('predict-results', 'predict-spinner', 'predict-empty', 'results');
+  }
+}
+</script>
+</body>
+</html>
