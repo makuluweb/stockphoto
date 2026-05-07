@@ -721,23 +721,12 @@ async function runDemand() {
 
 A photographer wants to understand current demand for: "${niche}"
 
-Respond ONLY with valid JSON (no markdown):
-{
-  "overallMomentum": <0-100 integer>,
-  "momentumLabel": "<Rising|Stable|Declining|Emerging>",
-  "trendingSince": "<e.g. Q2 2024>",
-  "trendingKeywords": [
-    { "keyword": "<string>", "growth": <0-100>, "volume": "<Low|Medium|High|Very High>" }
-  ],
-  "risingCategories": [
-    { "name": "<string>", "insight": "<1 sentence why this is rising>" }
-  ],
-  "seasonalShifts": [
-    { "period": "<e.g. Q4>", "opportunity": "<1 sentence specific opportunity>" }
-  ],
-  "downloadMomentum": "<2-3 sentence summary of download trends>",
-  "keyInsight": "<Single most important insight a photographer needs to know right now>"
-}`;
+Respond ONLY with a raw JSON object. No markdown, no explanation. Start with { and end with }.
+
+Rules: overallMomentum is an integer 0-100. momentumLabel is one of: Rising, Stable, Declining, Emerging. growth values are integers 0-100. volume is one of: Low, Medium, High, Very High.
+
+Example structure (replace all values):
+{"overallMomentum":72,"momentumLabel":"Rising","trendingSince":"Q1 2024","trendingKeywords":[{"keyword":"example keyword","growth":45,"volume":"High"},{"keyword":"another keyword","growth":30,"volume":"Medium"}],"risingCategories":[{"name":"Category Name","insight":"One sentence explaining why this category is growing."}],"seasonalShifts":[{"period":"Q4","opportunity":"One sentence describing the seasonal opportunity."}],"downloadMomentum":"Two to three sentences summarising download trends and what is driving them.","keyInsight":"The single most important thing a photographer needs to know right now."}`;
 
     const raw = await callClaude(prompt);
     const d = parseJSON(raw);
@@ -815,24 +804,12 @@ async function runSaturation() {
 
 Analyse saturation for: "${topic}"
 
-Respond ONLY with valid JSON (no markdown):
-{
-  "saturationScore": <0-100>,
-  "demandScore": <0-100>,
-  "opportunityScore": <0-100>,
-  "verdict": "<Avoid|Caution|Opportunity|Gold Mine>",
-  "verdictReason": "<2 sentences>",
-  "oversupplied": [
-    { "angle": "<string>", "reason": "<why oversupplied>" }
-  ],
-  "undersupplied": [
-    { "angle": "<string>", "reason": "<why this gap exists>" }
-  ],
-  "adjacentOpportunities": [
-    { "niche": "<string>", "saturation": <0-100>, "demand": <0-100>, "note": "<1 sentence>" }
-  ],
-  "strategicAdvice": "<3-4 sentence strategic recommendation>"
-}`;
+Respond ONLY with a raw JSON object. No markdown, no explanation. Start with { and end with }.
+
+Rules: all score fields are integers 0-100. verdict is one of: Avoid, Caution, Opportunity, Gold Mine. Provide 3-4 oversupplied angles, 3-4 undersupplied gaps, and 3-4 adjacent opportunities.
+
+Example structure (replace all values):
+{"saturationScore":78,"demandScore":65,"opportunityScore":42,"verdict":"Caution","verdictReason":"Two sentences explaining the verdict and what it means for photographers.","oversupplied":[{"angle":"Generic angle name","reason":"Why this angle is oversupplied."}],"undersupplied":[{"angle":"Specific gap name","reason":"Why this gap exists and who buys it."}],"adjacentOpportunities":[{"niche":"Related niche","saturation":30,"demand":70,"note":"One sentence about this opportunity."}],"strategicAdvice":"Three to four sentences of strategic advice for a photographer targeting this topic."}`;
 
     const raw = await callClaude(prompt);
     const d = parseJSON(raw);
@@ -1050,25 +1027,12 @@ async function runPredict() {
 
 Be rigorous and honest. Base your analysis on real stock market dynamics.
 
-Respond ONLY with valid JSON (no markdown):
-{
-  "approvalProbability": <0-100>,
-  "approvalNotes": "<2 sentences on approval chances>",
-  "commercialValue": "<Very Low|Low|Medium|High|Very High>",
-  "estimatedMonthlyDownloads": "<e.g. 0-2|2-10|10-30|30-100|100+>",
-  "estimatedMonthlyRevenue": "<e.g. $0-5|$5-25|$25-75|$75-200|$200+>",
-  "revenueHorizon": "<e.g. 3-6 months>",
-  "saturationRisk": <0-100>,
-  "competitionLevel": "<Low|Medium|High|Very High>",
-  "bestAgencies": [
-    { "agency": "<name>", "fit": <0-100>, "reason": "<1 sentence>" }
-  ],
-  "keywordsToRank": [<10-15 keywords>],
-  "improvementActions": [
-    { "action": "<specific thing to do>", "impact": "<Low|Medium|High>", "effort": "<Low|Medium|High>" }
-  ],
-  "overallVerdict": "<1-2 sentences honest verdict>"
-}`;
+Respond ONLY with a raw JSON object. No markdown, no explanation. Start with { and end with }.
+
+Rules: approvalProbability and saturationRisk are integers 0-100. agency fit values are integers 0-100. commercialValue is one of: Very Low, Low, Medium, High, Very High. competitionLevel is one of: Low, Medium, High, Very High. impact and effort are one of: Low, Medium, High. Provide 3 bestAgencies, 10-15 keywordsToRank strings, and 4-5 improvementActions.
+
+Example structure (replace all values):
+{"approvalProbability":74,"approvalNotes":"Two sentences on what helps or hurts approval chances.","commercialValue":"High","estimatedMonthlyDownloads":"10-30","estimatedMonthlyRevenue":"$25-75","revenueHorizon":"3-6 months","saturationRisk":45,"competitionLevel":"Medium","bestAgencies":[{"agency":"Adobe Stock","fit":85,"reason":"One sentence on why this agency fits."},{"agency":"Shutterstock","fit":72,"reason":"One sentence on why this agency fits."}],"keywordsToRank":["keyword one","keyword two","keyword three","keyword four","keyword five"],"improvementActions":[{"action":"Specific actionable improvement.","impact":"High","effort":"Low"}],"overallVerdict":"One to two sentences of honest final verdict."}`;
 
     const raw = await callClaude(prompt, predictImageData);
     const d = parseJSON(raw);
