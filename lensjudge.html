@@ -238,7 +238,7 @@ header,main{padding-left:16px;padding-right:16px;}
     <div class="logo">LENS JUDGE</div>
     <div class="tagline">◈ STOCK INTELLIGENCE PLATFORM · v2</div>
     <label for="kip">Anthropic API Key</label>
-    <input type="password" id="kip" placeholder="sk-ant-api03-…" autocomplete="off">
+    <input type="password" id="kip" placeholder="sk-ant-api03-…" autocomplete="off" onkeydown="if(event.key==='Enter')submitKey()">
     <div class="hint">
       Stored only in <strong>sessionStorage</strong> — cleared when you close the tab.
       Sent directly to <a href="https://api.anthropic.com" target="_blank">api.anthropic.com</a> only.<br><br>
