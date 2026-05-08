@@ -237,8 +237,8 @@
     <label for="kip">Anthropic API Key</label>
     <input type="password" id="kip" placeholder="sk-ant-api03-…" autocomplete="off" onkeydown="if(event.key==='Enter')submitKey()">
     <div class="hint">
-      Stored only in <strong>sessionStorage</strong> — cleared when you close the tab.
-      Sent directly to <a href="https://api.anthropic.com" target="_blank">api.anthropic.com</a> only.<br><br>
+      Stored in <strong>localStorage</strong> — persists across sessions. Sent directly to
+      <a href="https://api.anthropic.com" target="_blank">api.anthropic.com</a> only.<br><br>
       Get a key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>
     </div>
     <button class="btn" style="width:100%;font-size:13px;" onclick="submitKey()">Enter →</button>
@@ -255,7 +255,6 @@
           <div class="eyebrow">◈ STOCK INTELLIGENCE PLATFORM · v2</div>
           <div class="logo">LENS JUDGE</div>
         </div>
-        <div class="hdesc">Demand intelligence · Saturation gaps · Shoot briefs · Revenue prediction</div>
         <div class="key-ind" onclick="changeKey()"><span class="kdot"></span> API KEY SET</div>
         <div class="albums-trigger" onclick="openAlbums()">◫ ALBUMS</div>
       </div>
@@ -276,6 +275,11 @@
         <div class="irow">
           <input type="text" id="demand-input" placeholder='e.g. "remote work", "Australian outback", "sustainable packaging"…' onkeydown="if(event.key==='Enter')runDemand()">
           <button class="btn" onclick="runDemand()">Analyse →</button>
+        </div>
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+          <button class="btn-outline" style="width:100%;height:40px;font-size:11px;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="runGlobalIntelligence()">
+            ◉ Global Intelligence — What the world is buying right now
+          </button>
         </div>
       </div>
       <div id="demand-spin" class="sw" style="display:none"><div class="sp"></div><div class="sl">Consulting the market…</div></div>
@@ -432,7 +436,7 @@ function show(rid,sid,eid,mode){
 function submitKey(){
   const v=document.getElementById('kip').value.trim();
   if(v.length < 20){document.getElementById('key-err').style.display='block';return;}
-  apiKey=v; sessionStorage.setItem('lj_key',v);
+  apiKey=v; localStorage.setItem('lj_key',v);
   document.getElementById('key-gate').style.display='none';
   document.getElementById('app').style.display='block';
 }
@@ -440,10 +444,10 @@ function changeKey(){
   document.getElementById('app').style.display='none';
   document.getElementById('key-gate').style.display='flex';
   document.getElementById('kip').value=''; apiKey='';
-  sessionStorage.removeItem('lj_key');
+  localStorage.removeItem('lj_key');
 }
 window.addEventListener('DOMContentLoaded',()=>{
-  const saved=sessionStorage.getItem('lj_key');
+  const saved=localStorage.getItem('lj_key');
   if(saved){apiKey=saved;document.getElementById('key-gate').style.display='none';document.getElementById('app').style.display='block';}
   renderAlbumsList();
 });
@@ -472,6 +476,64 @@ async function callClaude(prompt, imageData=null){
   return (data.content||[]).map(b=>b.text||'').join('').replace(/```json|```/g,'').trim();
 }
 function parseJSON(raw){try{return JSON.parse(raw);}catch{return null;}}
+
+// ── GLOBAL INTELLIGENCE ──────────────────────────────────────────────────
+async function runGlobalIntelligence(){
+  show('demand-res','demand-spin','demand-empty','loading');
+  document.getElementById('demand-spin').querySelector('.sl').textContent = 'Reading global market signals…';
+  try{
+    const prompt=`You are a senior stock photo market analyst tracking global demand signals across Adobe Stock, Shutterstock, Getty, and Alamy in real time.
+
+Without any specific niche given, identify what is genuinely trending and in demand globally RIGHT NOW in stock photography. Focus on emerging commercial needs, cultural shifts, business trends, and underserved visual demands.
+
+Respond ONLY with a raw JSON object. No markdown, no explanation. Start with { and end with }.
+Rules: overallMomentum is an integer 0-100. momentumLabel is one of: Rising, Stable, Declining, Emerging. growth values are integers 0-100. volume is one of: Low, Medium, High, Very High. Provide 6-8 trendingKeywords, 4-5 risingCategories, 3-4 seasonalShifts.
+Example structure (replace all values):
+{"overallMomentum":78,"momentumLabel":"Rising","trendingSince":"Q1 2025","trendingKeywords":[{"keyword":"example global trend","growth":65,"volume":"High"}],"risingCategories":[{"name":"Category","insight":"Why this is rising globally right now."}],"seasonalShifts":[{"period":"Q3 2025","opportunity":"Specific seasonal opportunity right now."}],"downloadMomentum":"2-3 sentences on what is driving global stock photo downloads right now.","keyInsight":"The single most important global market signal photographers need to act on today."}`;
+    const d=parseJSON(await callClaude(prompt));
+    if(!d)throw new Error('Parse failed');
+    const mc=scoreColor(d.overallMomentum);
+    document.getElementById('demand-res').innerHTML=`
+      <div class="card" style="background:rgba(232,255,71,.04);border-color:rgba(232,255,71,.2);margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:10px;color:var(--accent);letter-spacing:.15em;font-family:'Space Mono',monospace">◉ GLOBAL INTELLIGENCE</span>
+        </div>
+        <p class="prose" style="font-size:13px">${d.keyInsight}</p>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="slabel">Global Momentum</div>
+          <div class="bignum" style="color:${mc}">${d.overallMomentum}</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">${pill(d.momentumLabel,mc)}<span style="font-size:10px;color:var(--textdim)">since ${d.trendingSince}</span></div>
+          ${bar(d.overallMomentum,mc)}
+        </div>
+        <div class="card"><div class="slabel">Download Momentum</div><p class="prose" style="font-size:13px">${d.downloadMomentum}</p></div>
+      </div>
+      <div class="card"><div class="slabel">Trending Globally Right Now</div>
+        ${(d.trendingKeywords||[]).map(kw=>`
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
+            <div style="font-size:12px;width:200px;flex-shrink:0">${kw.keyword}</div>
+            ${bar(kw.growth,C.green)}
+            <div style="color:${C.green};font-size:11px;width:32px;text-align:right">+${kw.growth}</div>
+            ${pill(kw.volume,C.grey)}
+          </div>`).join('')}
+      </div>
+      <div class="g2">
+        <div class="card"><div class="slabel">Rising Categories</div>
+          ${(d.risingCategories||[]).map(cat=>`<div class="bi" style="border-left:2px solid ${C.green}"><div class="bt" style="color:${C.green}">${cat.name}</div><div class="bb">${cat.insight}</div></div>`).join('')}
+        </div>
+        <div class="card"><div class="slabel">Seasonal Signals</div>
+          ${(d.seasonalShifts||[]).map(s=>`<div class="bi" style="border-left:2px solid ${C.amber}"><div class="bt" style="color:${C.amber}">${s.period}</div><div class="bb">${s.opportunity}</div></div>`).join('')}
+        </div>
+      </div>`;
+    show('demand-res','demand-spin','demand-empty','results');
+    document.getElementById('demand-spin').querySelector('.sl').textContent = 'Consulting the market…';
+  }catch(e){
+    document.getElementById('demand-res').innerHTML=`<div class="card" style="color:${C.red}">${e.message}</div>`;
+    show('demand-res','demand-spin','demand-empty','results');
+    document.getElementById('demand-spin').querySelector('.sl').textContent = 'Consulting the market…';
+  }
+}
 
 // ── DEMAND ────────────────────────────────────────────────────────────────
 async function runDemand(){
@@ -754,7 +816,7 @@ function exportPredictPDF(){
   </style></head><body>
   <h1>Revenue Intelligence Report</h1>
   <div class="sub">LENS JUDGE v2 · Generated ${new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}</div>
-  ${predictImageData?`<img src="${predictImageData.dataUrl}" style="width:100%;max-height:260px;object-fit:cover;border-radius:12px;margin-bottom:24px;">`:''} 
+  ${predictImageData?`<div style="width:100%;height:320px;margin-bottom:24px;border-radius:12px;overflow:hidden;border:1px solid #e0e0e0"><img src="${predictImageData.dataUrl}" style="width:100%;height:100%;object-fit:contain;background:#f5f5f5;display:block;"></div>`:''}
   <div class="metrics">
     <div class="metric"><div class="val" style="color:${ac}">${d.approvalProbability}%</div><div class="lbl">Approval Probability</div></div>
     <div class="metric"><div class="val" style="color:#1a1a2e;font-size:28px">${d.estimatedMonthlyRevenue}</div><div class="lbl">Est. Monthly Revenue</div></div>
